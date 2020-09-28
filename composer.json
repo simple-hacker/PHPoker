@@ -1,0 +1,26 @@
+{
+    "name": "simple-hacker/phpoker",
+    "description": "PHP library package for No Limit Texas Holdem poker",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michael Perks",
+            "email": "michael.perks@live.co.uk"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require-dev": {
+        "phpunit/phpunit": "^9.4@dev"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "SimpleHacker\\PHPoker\\": "src/"
+        }
+    },
+    "autoload-dev" : {
+        "psr-4" : {
+            "SimpleHacker\\PHPoker\\Tests": "test/"
+        }
+    }
+}
