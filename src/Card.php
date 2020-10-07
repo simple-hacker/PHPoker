@@ -66,98 +66,66 @@ class Card
     }
 
     /**
-    * Set the card's value
+    * Validate and set the card's value
     *
     * @param string|integer $value
     */
     private function setValue($value)
     {
-        if (! $this->isValidValue($value)) {
-            throw new InvalidCardException("Invalid card value ($value)");
-        }
-
-        if (is_int($value)) {
+        if (is_int($value) && $value > 0 && $value < 14) {
             $this->value = $value;
             return;
         }
 
+        // Otherwise a single character or string was passed.
+        // e.g. J or Jack
+
         $value = strtolower($value);
 
         if (strlen($value) === 1) {
-            $this->value = array_search($value, array_column($this->values, 'short_value')) + 1;
+            $index = array_search($value, array_column($this->values, 'short_value'));
+            $this->value = ($index !== false) ? $index + 1 : null;
         } else {
-            $this->value = array_search($value, array_column($this->values, 'value')) + 1;
+            $index = array_search($value, array_column($this->values, 'value'));
+            $this->value = ($index !== false) ? $index + 1 : null;
+        }
+
+        // If card's value is empty at this point then invalid card value given.
+        if (empty($this->value)) {
+            throw new InvalidCardException("Invalid card value ($value)");
         }
     }
 
     /**
-    * Set the card's suit
+    * Validate and set the card's suit
     *
     * @param string|integer $suit
     */
     private function setSuit($suit)
     {
-        if (! $this->isValidSuit($suit)) {
-            throw new InvalidCardException("Invalid card suit ($suit)");
-        }
-        
-        if (is_int($suit)) {
+        if (is_int($suit) && $suit > 0 && $suit < 14) {
             $this->suit = $suit;
             return;
         }
-        
-        $suit = strtolower($suit);
 
-        // If suit is one character
-        if (strlen($suit) === 1) {
-            // Find index of short suit.
-            $this->suit = array_search($suit, array_column($this->suits, 'short_suit')) + 1;
-        } else {
-            $suit = substr($suit, -1) === 's' ? substr($suit, 0, -1) : $suit;
-            $this->suit = array_search($suit, array_column($this->suits, 'suit')) + 1;
-        }
-    }
-
-    /**
-    * Check if valid value of card when instantiating
-    * 
-    * @param mixed $value
-    * @return boolean
-    */
-    private function isValidValue($value): Bool
-    {
-        if (is_int($value)) {
-            return ($value > 0 && $value < 14);
-        }
-
-        $value = strtolower($value);
-
-        if (strlen($value) === 1) {
-            return in_array($value, array_column($this->values, 'short_value'));
-        } else {
-            return in_array($value, array_column($this->values, 'value'));
-        }
-    }
-
-    /**
-    * Check if valid suit of card when instantiating
-    * 
-    * @param mixed $suit
-    * @return boolean
-    */
-    private function isValidSuit($suit): Bool
-    {
-        if (is_int($suit)) {
-            return ($suit > 0 && $suit < 5);
-        }
+        // Otherwise a single character or string was passed.
+        // e.g. H or Hearts
 
         $suit = strtolower($suit);
 
         if (strlen($suit) === 1) {
-            return in_array($suit, array_column($this->suits, 'short_suit'));
+            $index = array_search($suit, array_column($this->suits, 'short_suit'));
+            $this->suit = ($index !== false) ? $index + 1 : null;
+            return;
         } else {
             $suit = substr($suit, -1) === 's' ? substr($suit, 0, -1) : $suit;
-            return in_array($suit, array_column($this->suits, 'suit'));
+            $index = array_search($suit, array_column($this->suits, 'suit'));
+            $this->suit = ($index !== false) ? $index + 1 : null;
+        }
+
+        // If card's suit is empty at this point then invalid card suit given.
+        if (empty($this->suit)) {
+            throw new InvalidCardException("Invalid card suit ($suit)");
         }
     }
 
