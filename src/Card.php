@@ -2,7 +2,7 @@
 
 namespace SimpleHacker\PHPoker;
 
-use Exception;
+use SimpleHacker\PHPoker\Exceptions\InvalidCardException;
 
 class Card
 {
@@ -73,7 +73,7 @@ class Card
     private function setValue($value)
     {
         if (! $this->isValidValue($value)) {
-            throw new Exception('Invalid card value');
+            throw new InvalidCardException("Invalid card value ($value)");
         }
 
         if (is_int($value)) {
@@ -98,7 +98,7 @@ class Card
     private function setSuit($suit)
     {
         if (! $this->isValidSuit($suit)) {
-            throw new Exception('Invalid card suit');
+            throw new InvalidCardException("Invalid card suit ($suit)");
         }
         
         if (is_int($suit)) {
@@ -113,7 +113,7 @@ class Card
             // Find index of short suit.
             $this->suit = array_search($suit, array_column($this->suits, 'short_suit')) + 1;
         } else {
-            $suit = rtrim($suit, 's');
+            $suit = substr($suit, -1) === 's' ? substr($suit, 0, -1) : $suit;
             $this->suit = array_search($suit, array_column($this->suits, 'suit')) + 1;
         }
     }
@@ -133,9 +133,9 @@ class Card
         $value = strtolower($value);
 
         if (strlen($value) === 1) {
-            return array_search($value, array_column($this->values, 'short_value')) + 1;
+            return in_array($value, array_column($this->values, 'short_value'));
         } else {
-            return array_search($value, array_column($this->values, 'value')) + 1;
+            return in_array($value, array_column($this->values, 'value'));
         }
     }
 
@@ -148,16 +148,15 @@ class Card
     private function isValidSuit($suit): Bool
     {
         if (is_int($suit)) {
-            return ($suit > 0 && $suit < 14);
+            return ($suit > 0 && $suit < 5);
         }
 
         $suit = strtolower($suit);
 
-        // Valid suits
         if (strlen($suit) === 1) {
             return in_array($suit, array_column($this->suits, 'short_suit'));
         } else {
-            $suit = rtrim($suit, 's');
+            $suit = substr($suit, -1) === 's' ? substr($suit, 0, -1) : $suit;
             return in_array($suit, array_column($this->suits, 'suit'));
         }
     }

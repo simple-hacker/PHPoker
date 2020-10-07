@@ -5,6 +5,7 @@ namespace SimpleHacker\PHPoker\Tests;
 use SimpleHacker\PHPoker\Card;
 
 use PHPUnit\Framework\TestCase;
+use SimpleHacker\PHPoker\Exceptions\InvalidCardException;
 
 class CardTest extends TestCase
 {
@@ -54,6 +55,17 @@ class CardTest extends TestCase
         $card = new Card($value, $suit);
 
         $this->assertEquals($card->getShortDescription(), $description);
+    }
+
+    /**
+    * @test
+    * @dataProvider invalidCards
+    */
+    public function an_error_is_thrown_on_invalid_values_and_suits($value, $suit)
+    {
+        $this->expectException(InvalidCardException::class);
+
+        $card = new Card($value, $suit);
     }
 
     public function values()
@@ -128,6 +140,26 @@ class CardTest extends TestCase
             ['Jack', 'diamonds', 'Jd'],
             [4, 'Hearts', '4h'],
             ['T', 'clubs', 'Tc'],
+        ];
+    }
+
+    public function invalidCards()
+    {
+        return [
+            // Invalid values
+            // ['Acee', 's'],
+            // ['B', 's'],
+            // [-1, 's'],
+            // [0, 's'],
+            // [14, 's'],
+            // [15, 's'],
+            // Invalid suits
+            ['A', 'heartss'],
+            // ['A', 0],
+            // ['A', -1],
+            // ['A', 5],
+            // ['A', 'X'],
+            // ['A', 'B'],
         ];
     }
 }
