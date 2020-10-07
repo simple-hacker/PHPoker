@@ -15,12 +15,12 @@
     },
     "autoload" : {
         "psr-4" : {
-            "SimpleHacker\\PHPoker\\": "src/"
+            "simplehacker\\PHPoker\\": "src/"
         }
     },
     "autoload-dev" : {
         "psr-4" : {
-            "SimpleHacker\\PHPoker\\Tests": "test/"
+            "simplehacker\\PHPoker\\Tests\\": "test/"
         }
     }
 }

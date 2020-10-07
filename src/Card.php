@@ -1,8 +1,8 @@
 <?php
 
-namespace SimpleHacker\PHPoker;
+namespace simplehacker\PHPoker;
 
-use SimpleHacker\PHPoker\Exceptions\InvalidCardException;
+use simplehacker\PHPoker\Exceptions\InvalidCardException;
 
 class Card
 {

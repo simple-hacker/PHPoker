@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleHacker\PHPoker\Exceptions;
+namespace simplehacker\PHPoker\Exceptions;
 
 use Exception;
 

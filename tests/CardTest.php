@@ -1,11 +1,11 @@
 <?php
 
-namespace SimpleHacker\PHPoker\Tests;
+namespace simplehacker\PHPoker\Tests;
 
-use SimpleHacker\PHPoker\Card;
+use simplehacker\PHPoker\Card;
 
 use PHPUnit\Framework\TestCase;
-use SimpleHacker\PHPoker\Exceptions\InvalidCardException;
+use simplehacker\PHPoker\Exceptions\InvalidCardException;
 
 class CardTest extends TestCase
 {
@@ -177,7 +177,7 @@ class CardTest extends TestCase
             [-1, 's'],
             [0, 's'],
             [14, 's'],
-            [15, 's'],
+            ['', 's'],
             // Invalid suits
             ['A', 'heartss'],
             ['A', 0],
