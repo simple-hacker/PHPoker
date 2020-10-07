@@ -59,10 +59,32 @@ class Card
      * @param string|integer $value
      * @param string|integer $suit
      */
-    public function __construct($value, $suit)
+    public function __construct($value, $suit = null)
     {
+        // If suit is not given, then send shortValue for validation
+        // and split into value and suit
+        if (! $suit) {
+            [$value, $suit] = $this->splitValue($value);
+        }
+
         $this->setValue($value);
         $this->setSuit($suit);
+    }
+
+    /**
+    * If short value is given, split it in to value and suit
+    * 
+    * @param string $value
+    * @return array 
+    */
+    public function splitValue($shortValue): Array
+    {
+        $pattern = '/[A2-9TJQK][cdhs]/';
+        if (!is_string($shortValue) || strlen($shortValue) !== 2 || !preg_match($pattern, $shortValue)) {
+            throw new InvalidCardException("Invalid short value ($shortValue)");
+        }
+        
+        return [$shortValue[0], $shortValue[1]];
     }
 
     /**
@@ -79,13 +101,13 @@ class Card
         // Otherwise a single character or string was passed.
         // e.g. K or King
         if (is_string($value)) {
-            $value = strtolower($value);
+            $modifiedValue = strtolower($value);
             
-            if (strlen($value) === 1) {
-                $index = array_search($value, array_column($this->values, 'short_value'));
+            if (strlen($modifiedValue) === 1) {
+                $index = array_search($modifiedValue, array_column($this->values, 'short_value'));
                 $this->value = ($index !== false) ? $index + 1 : null;
             } else {
-                $index = array_search($value, array_column($this->values, 'value'));
+                $index = array_search($modifiedValue, array_column($this->values, 'value'));
                 $this->value = ($index !== false) ? $index + 1 : null;
             }
         }
@@ -111,14 +133,14 @@ class Card
         // e.g. H or Hearts
         if (is_string($suit)) {
 
-            $suit = strtolower($suit);
+            $modifiedSuit = strtolower($suit);
             
-            if (strlen($suit) === 1) {
-                $index = array_search($suit, array_column($this->suits, 'short_suit'));
+            if (strlen($modifiedSuit) === 1) {
+                $index = array_search($modifiedSuit, array_column($this->suits, 'short_suit'));
                 $this->suit = ($index !== false) ? $index + 1 : null;
             } else {
-                $suit = substr($suit, -1) === 's' ? substr($suit, 0, -1) : $suit;
-                $index = array_search($suit, array_column($this->suits, 'suit'));
+                $modifiedSuit = substr($modifiedSuit, -1) === 's' ? substr($modifiedSuit, 0, -1) : $modifiedSuit;
+                $index = array_search($modifiedSuit, array_column($this->suits, 'suit'));
                 $this->suit = ($index !== false) ? $index + 1 : null;
             }
         }

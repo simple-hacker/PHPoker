@@ -13,7 +13,7 @@ class CardTest extends TestCase
     * @test
     * @dataProvider values
     */
-    public function a_card_can_be_instantiated_with_valid_values($testValue, $value, $shortValue, $valueRank)
+    public function card_can_be_instantiated_with_valid_values($testValue, $value, $shortValue, $valueRank)
     {
         $card = new Card($testValue, 'spades');
 
@@ -26,7 +26,7 @@ class CardTest extends TestCase
     * @test
     * @dataProvider suits
     */
-    public function a_card_can_be_instantiated_with_valid_suits($testSuit, $suit, $shortSuit, $suitRank)
+    public function card_can_be_instantiated_with_valid_suits($testSuit, $suit, $shortSuit, $suitRank)
     {
         $card = new Card('A', $testSuit);
 
@@ -39,7 +39,7 @@ class CardTest extends TestCase
     * @test
     * @dataProvider descriptions
     */
-    public function a_card_has_a_description($value, $suit, $description)
+    public function card_has_a_description($value, $suit, $description)
     {
         $card = new Card($value, $suit);
 
@@ -50,7 +50,7 @@ class CardTest extends TestCase
     * @test
     * @dataProvider shortDescriptions
     */
-    public function a_card_has_a_short_description($value, $suit, $description)
+    public function card_has_a_short_description($value, $suit, $description)
     {
         $card = new Card($value, $suit);
 
@@ -66,6 +66,31 @@ class CardTest extends TestCase
         $this->expectException(InvalidCardException::class);
 
         $card = new Card($value, $suit);
+    }
+
+    /**
+    * @test
+    * @dataProvider shortValues
+    */
+    public function card_can_be_instantiated_with_short_values($shortValue, $value, $suit, $valueRank, $suitRank)
+    {
+        $card = new Card($shortValue);
+
+        $this->assertEquals($card->getValue(), $value);
+        $this->assertEquals($card->getSuit(), $suit);
+        $this->assertEquals($card->getValueRank(), $valueRank);
+        $this->assertEquals($card->getSuitRank(), $suitRank);
+    }
+
+    /**
+    * @test
+    * @dataProvider invalidShortValues
+    */
+    public function an_error_is_thrown_on_invalid_short_values($shortValue)
+    {
+        $this->expectException(InvalidCardException::class);
+
+        $card = new Card($shortValue);
     }
 
     public function values()
@@ -160,6 +185,30 @@ class CardTest extends TestCase
             ['A', 5],
             ['A', 'X'],
             ['A', 'B'],
+            ['A', ''],
+        ];
+    }
+
+    public function shortValues()
+    {
+        return [
+            ['4c', 'Four', 'Clubs', 4, 1],
+            ['Jd', 'Jack', 'Diamonds', 11, 2],
+            ['Ah', 'Ace', 'Hearts', 1, 3],
+            ['7s', 'Seven', 'Spades', 7, 4],
+        ];
+    }
+    
+    public function invalidShortValues()
+    {
+        return [
+            ['0d'],
+            ['0dxx'],
+            ['Dd'],
+            ['KH'],
+            ['js'],
+            ['4r'],
+            ['4S'],
         ];
     }
 }
