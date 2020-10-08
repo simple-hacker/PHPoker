@@ -25,7 +25,7 @@ class Card
      *
      * @var array
      */
-    protected $values = [
+    public static $values = [
         1 => ['short_value' => 'a', 'value' => 'ace'],
         2 => ['short_value' => 2, 'value' => 'two'],
         3 => ['short_value' => 3, 'value' => 'three'],
@@ -46,7 +46,7 @@ class Card
      *
      * @var array
      */
-    protected $suits = [
+    public static $suits = [
         1 => ['short_suit' => 'c', 'suit' => 'club'],
         2 => ['short_suit' => 'd', 'suit' => 'diamond'],
         3 => ['short_suit' => 'h', 'suit' => 'heart'],
@@ -104,10 +104,10 @@ class Card
             $modifiedValue = strtolower($value);
             
             if (strlen($modifiedValue) === 1) {
-                $index = array_search($modifiedValue, array_column($this->values, 'short_value'));
+                $index = array_search($modifiedValue, array_column(self::$values, 'short_value'));
                 $this->value = ($index !== false) ? $index + 1 : null;
             } else {
-                $index = array_search($modifiedValue, array_column($this->values, 'value'));
+                $index = array_search($modifiedValue, array_column(self::$values, 'value'));
                 $this->value = ($index !== false) ? $index + 1 : null;
             }
         }
@@ -136,11 +136,11 @@ class Card
             $modifiedSuit = strtolower($suit);
             
             if (strlen($modifiedSuit) === 1) {
-                $index = array_search($modifiedSuit, array_column($this->suits, 'short_suit'));
+                $index = array_search($modifiedSuit, array_column(self::$suits, 'short_suit'));
                 $this->suit = ($index !== false) ? $index + 1 : null;
             } else {
                 $modifiedSuit = substr($modifiedSuit, -1) === 's' ? substr($modifiedSuit, 0, -1) : $modifiedSuit;
-                $index = array_search($modifiedSuit, array_column($this->suits, 'suit'));
+                $index = array_search($modifiedSuit, array_column(self::$suits, 'suit'));
                 $this->suit = ($index !== false) ? $index + 1 : null;
             }
         }
@@ -158,7 +158,7 @@ class Card
     */
     public function getValue(): String
     {
-        return ucwords($this->values[$this->value]['value']);
+        return ucwords(self::$values[$this->value]['value']);
     }
 
     /**
@@ -168,7 +168,7 @@ class Card
     */
     public function getShortValue(): String
     {
-        return ucwords($this->values[$this->value]['short_value']);
+        return ucwords(self::$values[$this->value]['short_value']);
     }
 
     /**
@@ -188,7 +188,7 @@ class Card
     */
     public function getSuit(): String
     {
-        return ucwords($this->suits[$this->suit]['suit']) . 's';
+        return ucwords(self::$suits[$this->suit]['suit']) . 's';
     }
 
     /**
@@ -198,7 +198,7 @@ class Card
     */
     public function getShortSuit(): String
     {
-        return $this->suits[$this->suit]['short_suit'];
+        return self::$suits[$this->suit]['short_suit'];
     }
 
     /**
