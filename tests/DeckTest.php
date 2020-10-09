@@ -10,13 +10,10 @@ use PHPUnit\Framework\TestCase;
 class DeckTest extends TestCase
 {
     /** @test */
-    public function deck_can_be_instantiated()
+    public function deck_holds_52_cards()
     {
         $deck = new Deck();
-
-        var_dump(Card::$suits);
-        die();
-
-        $this->assertTrue(true);
+        
+        $this->assertCount(52, $deck->cards);
     }
 }
