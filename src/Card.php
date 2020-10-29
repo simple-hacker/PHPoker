@@ -9,14 +9,14 @@ class Card
     /**
      * The card's value
      * 
-     * @var mixed
+     * @var integer
      */
     protected $value;
 
     /**
      * The card's suit
      *
-     * @var mixed
+     * @var integer
      */
     protected $suit;
 
@@ -69,6 +69,17 @@ class Card
 
         $this->setValue($value);
         $this->setSuit($suit);
+    }
+
+    /**
+    * When Card class is converted to string, return the shortValue string
+    * This is used when compairing two Cards as a string when using array_unique
+    * 
+    * @return string
+    */
+    public function __toString(): String
+    {
+        return $this->getShortDescription();
     }
 
     /**
