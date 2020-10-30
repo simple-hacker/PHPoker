@@ -2,8 +2,6 @@
 
 namespace simplehacker\PHPoker;
 
-use phpDocumentor\Reflection\Types\Boolean;
-use phpDocumentor\Reflection\Types\Integer;
 use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Exceptions\InvalidDeckOperationException;
 
@@ -58,9 +56,6 @@ class Deck
         
         $findCard = array_search($card, $this->cards);
         
-        // var_dump(! $findCard);
-        // die();
-            
         if (! $findCard) {
             array_push($this->cards, $card);
         } else {

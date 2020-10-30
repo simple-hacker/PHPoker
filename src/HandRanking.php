@@ -24,11 +24,27 @@ class HandRanking
     protected $valueHistogram = [];
 
     /**
+     * The cards values histogram sorted by value highest to lowest
+     * This is needed for straights
+     * 
+     * @var array
+     */
+    protected $sortedValues = [];
+
+    /**
      * The cards sorted grouped and sorted by suit
      * 
      * @var array
      */
     protected $suitHistogram = [];
+
+    /**
+     * If a straight is found then this will be the five key values of the straight in order
+     * e.g. [13, 12, 11, 10, 9]
+     * 
+     * @var array
+     */
+    protected $foundStraight = [];
 
     /**
     * Instantiate the Hand Ranking class
@@ -70,6 +86,7 @@ class HandRanking
         }
 
         $this->valueHistogram = $this->computeValueHistogram();
+        $this->sortedValues = $this->computeSortedValues();
         $this->suitHistogram = $this->computeSuitHistogram();
     }
 
@@ -105,7 +122,7 @@ class HandRanking
     }
 
     /**
-    * Group and sort the cards according to their values
+    * Group and sort the cards according to the count of each value
     * 
     * @return array
     */
@@ -132,6 +149,20 @@ class HandRanking
         }
 
         return $values;
+    }
+
+    /**
+    * Sort the value histogram by value rank highest to lowest instead of count
+    * This is needed for straights
+    * 
+    * @return array
+    */
+    private function computeSortedValues(): Array
+    {
+        $sortedHistogram = $this->valueHistogram;
+        krsort($sortedHistogram, SORT_NUMERIC);
+
+        return $sortedHistogram;
     }
 
     /**
@@ -170,17 +201,6 @@ class HandRanking
     }
 
     /**
-    * Returns if the hand ranking is a flush
-    * Determined by if the count of the first element of suit histogram is five or greater
-    * 
-    * @return bool
-    */
-    public function isFlush(): Bool
-    {
-        return count(reset($this->suitHistogram)) >= 5;
-    }
-
-    /**
     * Returns if the hand ranking is a four of a kind
     * Determined by if the count of the first element of value histogram is exactly four
     * and second element is one or greater
@@ -204,6 +224,45 @@ class HandRanking
     {
         $values = array_values($this->valueHistogram);
         return (count($values[0]) === 3 && count($values[1]) >= 2);
+    }
+
+    /**
+    * Returns if the hand ranking is a flush
+    * Determined by if the count of the first element of suit histogram is five or greater
+    * 
+    * @return bool
+    */
+    public function isFlush(): Bool
+    {
+        return count(reset($this->suitHistogram)) >= 5;
+    }
+
+    /**
+    * Returns if the hand ranking is a straight
+    * Determined by if there are five keys of value histogram in sequential decending order (as it's sorted)
+    * 
+    * @return bool
+    */
+    public function isStraight(): Bool
+    {
+        $sortedValues = array_keys($this->sortedValues);
+
+        do {
+            // Take first five cards index values
+            $fiveCards = array_slice($sortedValues, 0, 5);
+            // Build a potential straight based off the first value of the first card
+            $compareStraight = range($sortedValues[0], $sortedValues[0]-4);
+            // If fiveCards is the same as the compareStraight that's been built, then true
+            if ($fiveCards === $compareStraight) {
+                $this->foundStraight = $fiveCards;
+                return true;
+            }
+            // If not sequential then remove first element and repeat while there are at least five cards
+            array_splice($sortedValues, 0, 1);
+        } while(count($sortedValues) > 4);
+
+        // Return false if no straight is found after looping and checking sequential of all given cards
+        return false;
     }
 
     /**

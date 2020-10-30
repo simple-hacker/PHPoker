@@ -69,25 +69,6 @@ class HandRankingTest extends TestCase
         $this->assertEquals($expected, $hand->getSuitHistogram());
     }
 
-    /**
-     * @test
-     * @dataProvider flushes
-    */
-    public function hand_ranking_is_a_flush($hand, $isFlush)
-    {
-        $hand = new HandRanking($hand);
-
-        $this->assertEquals($hand->isFlush(), $isFlush);
-    }
-
-    public function flushes() {
-        return [
-            ['7h3s8h2hKh4dTh', true],
-            ['3s4s5s6sKs', true],
-            ['2d3s4s8c9c', false],
-        ];
-    }
-
     /** @test */
     public function cards_are_grouped_and_sorted_by_value()
     {
@@ -123,9 +104,9 @@ class HandRankingTest extends TestCase
 
     public function fourOfAKinds() {
         return [
-            ['Jh8hJsJcJd', true],
-            ['6sKhKc9sKsKd', true],
-            ['Kh9c9d2s9h', false],
+            ['Jh8hJsJcJd', true], // JJJJ8
+            ['6sKhKc9sKsKd', true], // KKKK9
+            ['Kh9c9d2s9h', false], // Three of a kind
         ];
     }
 
@@ -146,6 +127,47 @@ class HandRankingTest extends TestCase
             ['9sKhKc9c3sKd', true], // KKK99
             ['5h9s5d5s9cKhKs', true], // 555KK
             ['Kh9c9d2s9h', false], // Three of a kind, not full house
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider flushes
+    */
+    public function hand_ranking_is_a_flush($hand, $isFlush)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isFlush(), $isFlush);
+    }
+
+    public function flushes() {
+        return [
+            ['7h3s8h2hKh4dTh', true],
+            ['3s4s5s6sKs', true],
+            ['2d3s4s8c9c', false],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider straights
+    */
+    public function hand_ranking_is_a_straight($hand, $isStraight)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isStraight(), $isStraight);
+    }
+
+    public function straights() {
+
+        // TODO: Need to test for Ace high  and Ace low straights
+
+        return [
+            ['8h9s6c7cTs', true], // T9876
+            ['3s4s5s6s2s7h8d', true], // 87654(32)
+            ['KsThQh9d8d7d', false], // High card, missing gutshot
         ];
     }
 
