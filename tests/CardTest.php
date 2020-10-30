@@ -9,6 +9,14 @@ use simplehacker\PHPoker\Exceptions\InvalidCardException;
 
 class CardTest extends TestCase
 {
+    /** @test */
+    public function test()
+    {
+        $card = new Card('Jh');
+
+        $this->assertEquals(11, $card->getValueRank());
+    }
+
     /**
     * @test
     * @dataProvider values
@@ -96,9 +104,11 @@ class CardTest extends TestCase
     public function values()
     {
         return [
-            [1, 'Ace', 'A', 1],
-            ['A', 'Ace', 'A', 1],
-            ['Ace', 'Ace', 'A', 1],
+            // Ace can be instantiated with either 1 or 14, but value is always 14 for high card
+            [1, 'Ace', 'A', 14],
+            [14, 'Ace', 'A', 14],
+            ['A', 'Ace', 'A', 14],
+            ['Ace', 'Ace', 'A', 14],
             [2, 'Two', 2, 2],
             ['Two', 'Two', 2, 2],
             [3, 'Three', 3, 3],
@@ -176,7 +186,7 @@ class CardTest extends TestCase
             ['B', 's'],
             [-1, 's'],
             [0, 's'],
-            [14, 's'],
+            [15, 's'],
             ['', 's'],
             // Invalid suits
             ['A', 'heartss'],
@@ -194,7 +204,7 @@ class CardTest extends TestCase
         return [
             ['4c', 'Four', 'Clubs', 4, 1],
             ['Jd', 'Jack', 'Diamonds', 11, 2],
-            ['Ah', 'Ace', 'Hearts', 1, 3],
+            ['Ah', 'Ace', 'Hearts', 14, 3],
             ['7s', 'Seven', 'Spades', 7, 4],
         ];
     }

@@ -160,6 +160,12 @@ class HandRanking
     private function computeSortedValues(): Array
     {
         $sortedHistogram = $this->valueHistogram;
+
+        // Copy aces and convert rank for low straight.
+        if (array_key_exists(14, $sortedHistogram)) {
+            $sortedHistogram[1] = $sortedHistogram[14];
+        }
+
         krsort($sortedHistogram, SORT_NUMERIC);
 
         return $sortedHistogram;

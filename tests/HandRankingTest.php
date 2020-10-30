@@ -60,7 +60,7 @@ class HandRankingTest extends TestCase
         $hand = new HandRanking([$FourD, $FiveS, $ThreeH, $AceH, $TwoH]);
 
         $expected = [
-            3 => [$ThreeH, $TwoH, $AceH],
+            3 => [$AceH, $ThreeH, $TwoH],
             4 => [$FiveS],
             2 => [$FourD]
         ];
@@ -102,7 +102,8 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isFourOfAKind(), $isFourOfAKind);
     }
 
-    public function fourOfAKinds() {
+    public function fourOfAKinds()
+    {
         return [
             ['Jh8hJsJcJd', true], // JJJJ8
             ['6sKhKc9sKsKd', true], // KKKK9
@@ -121,7 +122,8 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isFullHouse(), $isFullHouse);
     }
 
-    public function fullHouses() {
+    public function fullHouses()
+    {
         return [
             ['Jh8hJsJcJd', false], // Four of a kind
             ['9sKhKc9c3sKd', true], // KKK99
@@ -141,7 +143,8 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isFlush(), $isFlush);
     }
 
-    public function flushes() {
+    public function flushes()
+    {
         return [
             ['7h3s8h2hKh4dTh', true],
             ['3s4s5s6sKs', true],
@@ -160,11 +163,11 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isStraight(), $isStraight);
     }
 
-    public function straights() {
-
-        // TODO: Need to test for Ace high  and Ace low straights
-
+    public function straights()
+    {
         return [
+            ['AhTsQcJcKd', true], // AKQJT Broadway straight, A high
+            ['7hAh5s3c2c4d', true], // 54321 Wheel straight, A low
             ['8h9s6c7cTs', true], // T9876
             ['3s4s5s6s2s7h8d', true], // 87654(32)
             ['3s6s5s4s2sQhKd', true], // 65432
@@ -183,7 +186,8 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isThreeOfAKind(), $isThreeOfAKind);
     }
 
-    public function threeOfAKinds() {
+    public function threeOfAKinds()
+    {
         return [
             ['Jh8hJsJcJd', false], // Four of a kind
             ['9sKhKc9c3sKd', false], // Full house
@@ -203,7 +207,8 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isTwoPair(), $isTwoPair);
     }
 
-    public function twoPairs() {
+    public function twoPairs()
+    {
         return [
             ['Ks3s9h3c3hQcTs', false], // Three of a kind
             ['Kh9cKd2s9h', true], // KK992
@@ -223,7 +228,8 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isOnePair(), $isOnePair);
     }
 
-    public function onePairs() {
+    public function onePairs()
+    {
         return [
             ['Qs4h5h4s5cTsTc', false], // Two pairs
             ['Kh9cKd2sQh', true], // KKQ92
@@ -243,7 +249,8 @@ class HandRankingTest extends TestCase
         $this->assertEquals($hand->isHighCard(), $isHighCard);
     }
 
-    public function highCards() {
+    public function highCards()
+    {
         return [
             ['Kh9c6h4sKd2sQh', false], // Two Pair
             ['Kh9c6h4s3d2sQh', true], // KQ964

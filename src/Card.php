@@ -26,7 +26,6 @@ class Card
      * @var array
      */
     public static $values = [
-        1 => ['short_value' => 'a', 'value' => 'ace'],
         2 => ['short_value' => 2, 'value' => 'two'],
         3 => ['short_value' => 3, 'value' => 'three'],
         4 => ['short_value' => 4, 'value' => 'four'],
@@ -39,6 +38,7 @@ class Card
         11 => ['short_value' => 'j', 'value' => 'jack'],
         12 => ['short_value' => 'q', 'value' => 'queen'],
         13 => ['short_value' => 'k', 'value' => 'king'],
+        14 => ['short_value' => 'a', 'value' => 'ace'],
     ];
 
     /**
@@ -105,8 +105,8 @@ class Card
     */
     private function setValue($value)
     {
-        if (is_int($value) && $value > 0 && $value < 14) {
-            $this->value = $value;
+        if (is_int($value) && $value > 0 && $value < 15) {
+            $this->value = ($value === 1) ? 14 : $value;
         }
 
         // Otherwise a single character or string was passed.
@@ -115,11 +115,11 @@ class Card
             $modifiedValue = strtolower($value);
             
             if (strlen($modifiedValue) === 1) {
-                $index = array_search($modifiedValue, array_column(self::$values, 'short_value'));
-                $this->value = ($index !== false) ? $index + 1 : null;
+                // Need to combine the column and array keys so we have the correct index
+                $this->value = array_search($modifiedValue, array_combine(array_keys(self::$values), array_column(self::$values, 'short_value')));
             } else {
-                $index = array_search($modifiedValue, array_column(self::$values, 'value'));
-                $this->value = ($index !== false) ? $index + 1 : null;
+                // Need to combine the column and array keys so we have the correct index
+                $this->value = array_search($modifiedValue, array_combine(array_keys(self::$values), array_column(self::$values, 'value')));
             }
         }
         
@@ -147,12 +147,10 @@ class Card
             $modifiedSuit = strtolower($suit);
             
             if (strlen($modifiedSuit) === 1) {
-                $index = array_search($modifiedSuit, array_column(self::$suits, 'short_suit'));
-                $this->suit = ($index !== false) ? $index + 1 : null;
+                $this->suit = array_search($modifiedSuit, array_combine(array_keys(self::$suits), array_column(self::$suits, 'short_suit')));
             } else {
                 $modifiedSuit = substr($modifiedSuit, -1) === 's' ? substr($modifiedSuit, 0, -1) : $modifiedSuit;
-                $index = array_search($modifiedSuit, array_column(self::$suits, 'suit'));
-                $this->suit = ($index !== false) ? $index + 1 : null;
+                $this->suit = array_search($modifiedSuit, array_combine(array_keys(self::$suits), array_column(self::$suits, 'suit')));
             }
         }
 
