@@ -167,6 +167,7 @@ class HandRankingTest extends TestCase
         return [
             ['8h9s6c7cTs', true], // T9876
             ['3s4s5s6s2s7h8d', true], // 87654(32)
+            ['3s6s5s4s2sQhKd', true], // 65432
             ['KsThQh9d8d7d', false], // High card, missing gutshot
         ];
     }

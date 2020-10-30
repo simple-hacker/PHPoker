@@ -17,14 +17,14 @@ class HandRanking
     protected $cards = [];
 
     /**
-     * The cards sorted grouped and sorted by value
+     * The cards grouped and sorted by count of each value rank
      * 
      * @var array
      */
     protected $valueHistogram = [];
 
     /**
-     * The cards values histogram sorted by value highest to lowest
+     * The cards values histogram sorted by value rank highest to lowest
      * This is needed for straights
      * 
      * @var array
@@ -32,7 +32,7 @@ class HandRanking
     protected $sortedValues = [];
 
     /**
-     * The cards sorted grouped and sorted by suit
+     * The cards grouped and sorted by count of each suit
      * 
      * @var array
      */
@@ -245,6 +245,7 @@ class HandRanking
     */
     public function isStraight(): Bool
     {
+        // Grab the keys of the sortedValues
         $sortedValues = array_keys($this->sortedValues);
 
         do {
@@ -252,7 +253,7 @@ class HandRanking
             $fiveCards = array_slice($sortedValues, 0, 5);
             // Build a potential straight based off the first value of the first card
             $compareStraight = range($sortedValues[0], $sortedValues[0]-4);
-            // If fiveCards is the same as the compareStraight that's been built, then true
+            // If fiveCards is the same as the compareStraight that's been built, then a straight has been found
             if ($fiveCards === $compareStraight) {
                 $this->foundStraight = $fiveCards;
                 return true;
