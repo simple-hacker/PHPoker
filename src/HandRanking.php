@@ -64,9 +64,9 @@ class HandRanking
         }
 
         // Throw error if less than five cards given because at least five are needed to determine hand rank
-        // More than five valid because we determine best five cards out of x provided
-        if (count($this->cards) < 5) {
-            throw new InvalidHandRankingException('Need at least 5 cards to determine hand ranking');
+        // Up to eight cards are valid because we determine best five cards out of x provided
+        if (count($this->cards) < 5 || count($this->cards) > 8) {
+            throw new InvalidHandRankingException('Need between 5 and 8 cards to determine hand ranking');
         }
 
         $this->valueHistogram = $this->computeValueHistogram();
@@ -111,7 +111,27 @@ class HandRanking
     */
     private function computeValueHistogram(): Array
     {
-        return [];
+        $values = [];
+
+        // Group all cards in to values
+        foreach ($this->cards as $card) {
+            $values[$card->getValueRank()][] = $card;
+        }
+
+        // Sort values by count of cards in each value.
+        // uasort is user defined sorting function which maintains keys which are numerical value of value
+        uasort($values, fn($value1, $value2) => count($value2) <=> count($value1));
+
+        // Sort cards of each value according to their suit rank highest first
+        foreach($values as $index => $value) {
+            // Create copy of array to sort
+            $sortedValues = $value;
+            usort($sortedValues, fn($card1, $card2) => $card2->getSuitRank() <=> $card1->getSuitRank());
+            // Replace value array with sortedArray at index
+            $values[$index] = $sortedValues;
+        }
+
+        return $values;
     }
 
     /**
@@ -137,7 +157,7 @@ class HandRanking
         // uasort is user defined sorting function which maintains keys which are numerical value of suit
         uasort($suits, fn($suit1, $suit2) => count($suit2) <=> count($suit1));
 
-        // Sort cards of each suit according to their value
+        // Sort cards of each suit according to their value rank highest first
         foreach($suits as $index => $suit) {
             // Create copy of array to sort
             $sortedValues = $suit;
@@ -151,12 +171,89 @@ class HandRanking
 
     /**
     * Returns if the hand ranking is a flush
-    * Determined if the count of the first element of suit histogram is five or greater
+    * Determined by if the count of the first element of suit histogram is five or greater
     * 
     * @return bool
     */
     public function isFlush(): Bool
     {
         return count(reset($this->suitHistogram)) >= 5;
+    }
+
+    /**
+    * Returns if the hand ranking is a four of a kind
+    * Determined by if the count of the first element of value histogram is exactly four
+    * and second element is one or greater
+    * 
+    * @return bool
+    */
+    public function isFourOfAKind(): Bool
+    {
+        $values = array_values($this->valueHistogram);
+        return (count($values[0]) === 4 && count($values[1]) >= 1);
+    }
+
+    /**
+    * Returns if the hand ranking is a full house
+    * Determined by if the count of the first element of value histogram is exactly three
+    * and second element is two or greater
+    * 
+    * @return bool
+    */
+    public function isFullHouse(): Bool
+    {
+        $values = array_values($this->valueHistogram);
+        return (count($values[0]) === 3 && count($values[1]) >= 2);
+    }
+
+    /**
+    * Returns if the hand ranking is a three of a kind
+    * Determined by if the count of the first element of value histogram is exactly three
+    * and second element and third element are exactly one.
+    * 
+    * @return bool
+    */
+    public function isThreeOfAKind(): Bool
+    {
+        $values = array_values($this->valueHistogram);
+        return (count($values[0]) === 3 && count($values[1]) === 1 && count($values[2]) === 1);
+    }
+
+    /**
+    * Returns if the hand ranking is two pairs
+    * Determined by if the count of the first and second elements of value histogram are exactly two
+    * and third element is one or greater
+    * 
+    * @return bool
+    */
+    public function isTwoPair(): Bool
+    {
+        $values = array_values($this->valueHistogram);
+        return (count($values[0]) === 2 && count($values[1]) === 2 && count($values[2]) >= 1);
+    }
+
+    /**
+    * Returns if the hand ranking is one pairs
+    * Determined by if the count of the first element is exactly two
+    * and second, third and fourth element is exactly one
+    * 
+    * @return bool
+    */
+    public function isOnePair(): Bool
+    {
+        $values = array_values($this->valueHistogram);
+        return (count($values[0]) === 2 && count($values[1]) === 1 && count($values[2]) === 1 && count($values[3]) === 1);
+    }
+
+    /**
+    * Returns if the hand ranking is one pairs
+    * Determined by if the count of the each elemt is exactly one
+    * 
+    * @return bool
+    */
+    public function isHighCard(): Bool
+    {
+        $values = array_values($this->valueHistogram);
+        return (count($values[0]) === 1 && count($values[1]) === 1 && count($values[2]) === 1 && count($values[3]) === 1 && count($values[4]) === 1);
     }
 }

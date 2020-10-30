@@ -86,5 +86,145 @@ class HandRankingTest extends TestCase
             ['3s4s5s6sKs', true],
             ['2d3s4s8c9c', false],
         ];
-    } 
+    }
+
+    /** @test */
+    public function cards_are_grouped_and_sorted_by_value()
+    {
+        // Three Jacks, Two Kings, One Five
+        $JackS = new Card('Js');
+        $KingC = new Card('Kc');
+        $JackC = new Card('Jc');
+        $JackH = new Card('Jh');
+        $FiveD = new Card('5d');
+        $KingS = new Card('Ks');
+
+        $hand = new HandRanking([$KingS, $FiveD, $JackC, $JackS, $KingC, $JackH]);
+
+        $expected = [
+            11 => [$JackS, $JackH, $JackC],
+            13 => [$KingS, $KingC],
+            5 => [$FiveD],
+        ];
+
+        $this->assertEquals($expected, $hand->getValueHistogram());
+    }
+
+    /**
+     * @test
+     * @dataProvider fourOfAKinds
+    */
+    public function hand_ranking_is_a_four_of_a_kind($hand, $isFourOfAKind)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isFourOfAKind(), $isFourOfAKind);
+    }
+
+    public function fourOfAKinds() {
+        return [
+            ['Jh8hJsJcJd', true],
+            ['6sKhKc9sKsKd', true],
+            ['Kh9c9d2s9h', false],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider fullHouses
+    */
+    public function hand_ranking_is_a_full_house($hand, $isFullHouse)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isFullHouse(), $isFullHouse);
+    }
+
+    public function fullHouses() {
+        return [
+            ['Jh8hJsJcJd', false], // Four of a kind
+            ['9sKhKc9c3sKd', true], // KKK99
+            ['5h9s5d5s9cKhKs', true], // 555KK
+            ['Kh9c9d2s9h', false], // Three of a kind, not full house
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider threeOfAKinds
+    */
+    public function hand_ranking_is_a_three_of_a_kind($hand, $isThreeOfAKind)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isThreeOfAKind(), $isThreeOfAKind);
+    }
+
+    public function threeOfAKinds() {
+        return [
+            ['Jh8hJsJcJd', false], // Four of a kind
+            ['9sKhKc9c3sKd', false], // Full house
+            ['Ks3s9h3c3hQcTs', true], // 333KQ
+            ['Kh9c9d2s9h', true], // 999K2
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider twoPairs
+    */
+    public function hand_ranking_is_two_pair($hand, $isTwoPair)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isTwoPair(), $isTwoPair);
+    }
+
+    public function twoPairs() {
+        return [
+            ['Ks3s9h3c3hQcTs', false], // Three of a kind
+            ['Kh9cKd2s9h', true], // KK992
+            ['Qs4h5h4s5cTsTc', true], // TT55Q (technically three pairs TT5544)
+            ['Kh9cKd2sQh', false], // Only one pair KKQ92
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider onePairs
+    */
+    public function hand_ranking_is_one_pair($hand, $isOnePair)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isOnePair(), $isOnePair);
+    }
+
+    public function onePairs() {
+        return [
+            ['Qs4h5h4s5cTsTc', false], // Two pairs
+            ['Kh9cKd2sQh', true], // KKQ92
+            ['Kh9c6h4sKd2sQh', true], // KKQ96
+            ['Kh9c6h4s3d2sQh', false], // High card
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider highCards
+    */
+    public function hand_ranking_is_high_card($hand, $isHighCard)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isHighCard(), $isHighCard);
+    }
+
+    public function highCards() {
+        return [
+            ['Kh9c6h4sKd2sQh', false], // Two Pair
+            ['Kh9c6h4s3d2sQh', true], // KQ964
+            ['Kh9c4s3d2sQhJsAh', true], // AKQJ9
+        ];
+    }
 }
