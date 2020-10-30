@@ -93,6 +93,46 @@ class HandRankingTest extends TestCase
 
     /**
      * @test
+     * @dataProvider royalFlushes
+    */
+    public function hand_ranking_is_a_royal_flush($hand, $isRoyalFlush)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isRoyalFlush(), $isRoyalFlush);
+    }
+
+    public function royalFlushes()
+    {
+        return [
+            ['AcQcTcKcJc', true], // AKQJTc
+            ['AcQcTcKcJc9c8c', true], // AKQJTc
+            ['7h3h6h5h4h', false], // Only a straight flush
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider straightFlushes
+    */
+    public function hand_ranking_is_a_straight_flush($hand, $isStraightFlush)
+    {
+        $hand = new HandRanking($hand);
+
+        $this->assertEquals($hand->isStraightFlush(), $isStraightFlush);
+    }
+
+    public function straightFlushes()
+    {
+        return [
+            ['7h3h6h5h4h', true], // 76543h
+            ['QdTd4s9dJd8h8d', true], // QJT98d
+            ['Th9h8h6h5h', false], // Is a flush but missing gutshot for straight flush
+        ];
+    }
+
+    /**
+     * @test
      * @dataProvider fourOfAKinds
     */
     public function hand_ranking_is_a_four_of_a_kind($hand, $isFourOfAKind)

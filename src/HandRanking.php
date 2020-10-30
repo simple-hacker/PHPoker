@@ -207,6 +207,42 @@ class HandRanking
     }
 
     /**
+    * Returns if the hand ranking is a Royal flush
+    * First check if a flush exists, and the top five flush cards equal a Royal flush
+    * Cards in each suitHistogram are already sorted high to low
+    * 
+    * @return bool
+    */
+    public function isRoyalFlush(): Bool
+    {
+        if ($this->isFlush()) {
+            $flushCardValues = array_map(fn($card) => (int) $card->getValueRank(), reset($this->suitHistogram));
+            $fiveCards = array_slice($flushCardValues, 0, 5);
+            return $fiveCards === [14, 13, 12, 11, 10];
+        }
+
+        return false;
+    }
+
+    /**
+    * Returns if the hand ranking is a straight flush
+    * First check if a flush exists
+    * If so, send through card values of given flush to findStraight
+    * Cards in each suitHistogram are already sorted high to low
+    * 
+    * @return bool
+    */
+    public function isStraightFlush(): Bool
+    {
+        if ($this->isFlush()) {
+            $flushCardValues = array_map(fn($card) => (int) $card->getValueRank(), reset($this->suitHistogram));
+            return $this->findStraight($flushCardValues);
+        }
+
+        return false;
+    }
+
+    /**
     * Returns if the hand ranking is a four of a kind
     * Determined by if the count of the first element of value histogram is exactly four
     * and second element is one or greater
@@ -254,19 +290,31 @@ class HandRanking
         // Grab the keys of the sortedValues
         $sortedValues = array_keys($this->sortedValues);
 
+        return $this->findStraight($sortedValues);
+    }
+
+    /**
+    * Given a list of card values, find a straight
+    * 
+    * @param array $values
+    * @return bool
+    */
+    private function findStraight($values): Bool
+    {
         do {
             // Take first five cards index values
-            $fiveCards = array_slice($sortedValues, 0, 5);
+            $fiveCards = array_slice($values, 0, 5);
             // Build a potential straight based off the first value of the first card
-            $compareStraight = range($sortedValues[0], $sortedValues[0]-4);
+            $compareStraight = range($values[0], $values[0]-4);
             // If fiveCards is the same as the compareStraight that's been built, then a straight has been found
             if ($fiveCards === $compareStraight) {
+                // TODO: Put this line here or to isStraight()?
                 $this->foundStraight = $fiveCards;
                 return true;
             }
             // If not sequential then remove first element and repeat while there are at least five cards
-            array_splice($sortedValues, 0, 1);
-        } while(count($sortedValues) > 4);
+            array_splice($values, 0, 1);
+        } while(count($values) > 4);
 
         // Return false if no straight is found after looping and checking sequential of all given cards
         return false;
