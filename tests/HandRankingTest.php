@@ -92,8 +92,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider royalFlushes
+    * @test
+    * @dataProvider royalFlushes
     */
     public function hand_ranking_is_a_royal_flush($hand, $isRoyalFlush)
     {
@@ -112,8 +112,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider straightFlushes
+    * @test
+    * @dataProvider straightFlushes
     */
     public function hand_ranking_is_a_straight_flush($hand, $isStraightFlush)
     {
@@ -132,8 +132,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider fourOfAKinds
+    * @test
+    * @dataProvider fourOfAKinds
     */
     public function hand_ranking_is_a_four_of_a_kind($hand, $isFourOfAKind)
     {
@@ -152,8 +152,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider fullHouses
+    * @test
+    * @dataProvider fullHouses
     */
     public function hand_ranking_is_a_full_house($hand, $isFullHouse)
     {
@@ -173,8 +173,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider flushes
+    * @test
+    * @dataProvider flushes
     */
     public function hand_ranking_is_a_flush($hand, $isFlush)
     {
@@ -193,8 +193,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider straights
+    * @test
+    * @dataProvider straights
     */
     public function hand_ranking_is_a_straight($hand, $isStraight)
     {
@@ -216,8 +216,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider threeOfAKinds
+    * @test
+    * @dataProvider threeOfAKinds
     */
     public function hand_ranking_is_a_three_of_a_kind($hand, $isThreeOfAKind)
     {
@@ -237,8 +237,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider twoPairs
+    * @test
+    * @dataProvider twoPairs
     */
     public function hand_ranking_is_two_pair($hand, $isTwoPair)
     {
@@ -258,8 +258,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider onePairs
+    * @test
+    * @dataProvider onePairs
     */
     public function hand_ranking_is_one_pair($hand, $isOnePair)
     {
@@ -279,8 +279,8 @@ class HandRankingTest extends TestCase
     }
 
     /**
-     * @test
-     * @dataProvider highCards
+    * @test
+    * @dataProvider highCards
     */
     public function hand_ranking_is_high_card($hand, $isHighCard)
     {
@@ -297,4 +297,46 @@ class HandRankingTest extends TestCase
             ['Kh9c4s3d2sQhJsAh', true], // AKQJ9
         ];
     }
+
+    /**
+    * @test
+    * @dataProvider bestHands
+    */
+    public function hand_ranking_gives_best_five_cards($cards, $handShortDescription, $handDescription, $handRank)
+    {
+        $hand = new HandRanking($cards);
+        // $this->assertEquals($hand->getHand(), $hand);
+        $this->assertEquals($hand->getShortDescription(), $handShortDescription);
+        $this->assertEquals($hand->getDescription(), $handDescription);
+        $this->assertEquals($hand->getRank(), $handRank);
+    }
+
+    public function bestHands()
+    {
+        // High Card King
+        // One Pair, Jacks
+        // Two Pair, Kings and Fours
+        // Three of a Kind, Jacks
+        // Straight, King to Nine
+        // Flush, King high Diamonds
+        // Full House, Eights full of Threes
+        // Four of a Kind, Jacks
+        // Straight Flush, King to Nine of Diamonds
+        // Royal Flush, Ace to Ten of Diamonds
+
+        return [
+            ['3hJdQdAdKdTd6s', 'AdKdQdJdTd', 'Royal Flush, Ace to Ten of Diamonds', 10],
+            ['3hTd6d8d7d9d6s', 'Td9d8d7d6d', 'Straight Flush, Ten to Six of Diamonds', 9],
+            ['7sJs9dJc7hJhJdAh', 'JsJhJdJcAh', 'Four of a Kind, Jacks', 8],
+            ['6dTd5c6h6sTs5h', '6s6h6dTsTd', 'Full House, Sixs full of Tens', 7], //666TT55 given
+            ['6dTd5c6h6sTsTh', 'TsThTd6s6h', 'Full House, Tens full of Sixs', 7], //TTT6665 given
+            ['AcKd2d4s8d3d9dTd', 'KdTd9d8d3d', 'Flush, King high of Diamonds', 6],
+            ['Qc9sJd4cTc4d8s', 'QcJdTc9s8s', 'Straight, Queen to Eight', 5],
+            ['Qc8sKhJhAsJdJc', 'JhJdJcAsKh', 'Three of a Kind, Jacks', 4],
+            ['3s8dQs4dKc8c4h', '8d8c4h4dKc', 'Two Pair, Eights and Fours', 3],
+            ['Tc3sAdQh4d6h4c', '4d4cAdQhTc', 'One Pair, Fours', 2],
+            ['3sQh4hTc8sKd6d5c', 'KdQhTc8s6d', 'High Card, King', 1],
+        ];
+    }
 }
+

@@ -2,9 +2,7 @@
 
 namespace simplehacker\PHPoker;
 
-use phpDocumentor\Reflection\Types\Boolean;
 use simplehacker\PHPoker\Card;
-use simplehacker\PHPoker\Exceptions\InvalidCardException;
 use simplehacker\PHPoker\Exceptions\InvalidHandRankingException;
 
 class HandRanking
@@ -15,6 +13,38 @@ class HandRanking
      * @var array
      */
     protected $cards = [];
+
+    /**
+     * The best five cards given for the hand ranking
+     * 
+     * @var array
+     */
+    protected $hand = [];
+
+    /**
+     * The hand ranking rank
+     * e.g. Royal Flush = 10, Three of a Kind = 4
+     * Used when compairing two hands together to determine winner
+     * 
+     * @var integer
+     */
+    protected $rank = 0;
+
+    /**
+     * The hand ranking short description
+     * e.g. Kh9c6h4s3d
+     * 
+     * @var string
+     */
+    protected $shortDescription = '';
+
+    /**
+     * The hand ranking description
+     * e.g. Four of a Kind, Jacks
+     * 
+     * @var string
+     */
+    protected $description = '';
 
     /**
      * The cards grouped and sorted by count of each value rank
@@ -88,6 +118,8 @@ class HandRanking
         $this->valueHistogram = $this->computeValueHistogram();
         $this->sortedValues = $this->computeSortedValues();
         $this->suitHistogram = $this->computeSuitHistogram();
+
+        $this->computeBestHand();
     }
 
     /**
@@ -99,6 +131,40 @@ class HandRanking
     {
         return $this->cards;
     }
+
+
+    /**
+    * Returns short values description of the best hand found
+    * e.g. Kh9c6h4s3d
+    *
+    * @return string
+    */
+    public function getShortDescription(): String
+    {
+        return $this->shortDescription;
+    }
+
+    /**
+    * Returns the description of the best hand found
+    * e.g. Four of a Kind, Jacks
+    *
+    * @return string
+    */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+    * Returns the hand ranking rank
+    *
+    * @return integer
+    */
+    public function getRank(): Int
+    {
+        return $this->rank;
+    }
+
 
     /**
     * Returns the protected array of cards grouped and sorted by value
@@ -137,7 +203,13 @@ class HandRanking
 
         // Sort values by count of cards in each value.
         // uasort is user defined sorting function which maintains keys which are numerical value of value
-        uasort($values, fn($value1, $value2) => count($value2) <=> count($value1));
+        uasort($values, function($value1, $value2) {
+            // If count is the same, sort by card value rank
+            // Else sort by number of cards for value
+            return (count($value2) === count($value1))
+                        ? $value2[0]->getValueRank() <=> $value1[0]->getValueRank()
+                        : count($value2) <=> count($value1);
+        });
 
         // Sort cards of each value according to their suit rank highest first
         foreach($values as $index => $value) {
@@ -204,6 +276,134 @@ class HandRanking
         }
 
         return $suits;
+    }
+
+    /**
+    * Gets the best five cards of given cards
+    * Assigns a hand rank value to compare with other hands
+    * Updates hand descriptions
+    * 
+    * @return void
+    */
+    private function computeBestHand()
+    {
+        if ($this->isRoyalFlush())
+        {
+            $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
+            $this->rank = 10;
+            $this->description = 'Royal Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
+        }
+        elseif ($this->isStraightFlush())
+        {
+            $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
+            $this->rank = 9;
+            $this->description = 'Straight Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
+        }
+        elseif ($this->isFourOfAKind())
+        {
+            $fourOfAKind = array_slice(reset($this->valueHistogram), 0, 4);
+            $valueHistogramKeys = array_keys($this->valueHistogram);
+            $notIncluding = array_splice($valueHistogramKeys, 0, 1);
+            $highestCard = $this->getHighCard($notIncluding);
+            $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
+            $this->hand = $fourOfAKind;
+            $this->rank = 8;
+            $this->description = 'Four of a Kind, ' . $this->hand[0]->getValue() . 's';
+        }
+        elseif ($this->isFullHouse())
+        {
+            $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 2));
+            $this->rank = 7;
+            $this->description = 'Full House, ' . $this->hand[0]->getValue() . 's full of ' . $this->hand[3]->getValue() . 's';
+        }
+        elseif ($this->isFlush())
+        {
+            $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
+            $this->rank = 6;
+            $this->description = 'Flush, ' . $this->hand[0]->getValue() . ' high of ' . $this->hand[0]->getSuit();
+        }
+        elseif ($this->isStraight())
+        {
+            // Loop through the foundStraight and return the first Card at valueIndex
+            $this->hand = array_map(fn($valueIndex) => $this->valueHistogram[$valueIndex][0], $this->foundStraight);
+            $this->rank = 5;
+            $this->description = 'Straight, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue();
+        }
+        elseif ($this->isThreeOfAKind())
+        {
+            $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 1), array_slice(next($this->valueHistogram), 0, 1));
+            $this->rank = 4;
+            $this->description = 'Three of a Kind, ' . $this->hand[0]->getValue() .'s';
+        }
+        elseif ($this->isTwoPair())
+        {
+            $twoPair = array_merge(array_slice(reset($this->valueHistogram), 0, 2), array_slice(next($this->valueHistogram), 0, 2));
+            $valueHistogramKeys = array_keys($this->valueHistogram);
+            $notIncluding = array_splice($valueHistogramKeys, 0, 2);
+            $highestCard = $this->getHighCard($notIncluding);
+            $twoPair[] = $highestCard; // Append highestCard to twoPair
+            $this->hand = $twoPair;
+            $this->rank = 3;
+            $this->description = 'Two Pair, ' . $this->hand[0]->getValue() .'s and ' . $this->hand[2]->getValue() .'s';
+        }
+        elseif ($this->isOnePair())
+        {
+            $this->hand = array_merge(
+                                array_slice(reset($this->valueHistogram), 0, 2),
+                                array_slice(next($this->valueHistogram), 0, 1),
+                                array_slice(next($this->valueHistogram), 0, 1),
+                                array_slice(next($this->valueHistogram), 0, 1)
+                        );
+            $this->rank = 2;
+            $this->description = 'One Pair, ' . $this->hand[0]->getValue() .'s';
+        }
+        elseif ($this->isHighCard())
+        {
+            $this->hand = array_merge(
+                                array_slice(reset($this->valueHistogram), 0, 1),
+                                array_slice(next($this->valueHistogram), 0, 1),
+                                array_slice(next($this->valueHistogram), 0, 1),
+                                array_slice(next($this->valueHistogram), 0, 1),
+                                array_slice(next($this->valueHistogram), 0, 1)
+                        );
+            $this->rank = 1;
+            $this->description = 'High Card, ' . $this->hand[0]->getValue();
+        }
+        
+        if (count($this->hand) !== 5) {
+            throw new InvalidHandRankingException('Unable to determine best hand rank');
+        }
+
+        // Generate hand short description by combining the shortDescription of each card in the best hand
+        foreach($this->hand as $card) {
+            $this->shortDescription .= $card->getShortDescription();
+        }
+    }
+
+    /**
+    * Returns the next highest card rank excluding certains values
+    * This is needed for Four of a Kind and Two Pair
+    * valueHistogram for 7sJs9dJc7hJhJdAh would be J=4, 7=2, A=1, 9=1
+    * Best hand is JJJJA and not JJJJ7 so we can't just get the second value of the histogram
+    * Similary if three pairs are given but best hand is two pair
+    * valueHistogram for 7sJs9dKc7hKhJdAh would be K=2, J=2, 7=2, A=1, 9=1
+    * Best hand is KKJJA and not KKJJ7
+    * 
+    * @param array $notIncluding
+    * @return Card
+    */
+    private function getHighCard(array $notIncluding): Card
+    {
+        $valueHistogramKeys = array_keys($this->valueHistogram);
+        $otherKeys = array_diff($valueHistogramKeys, $notIncluding);
+        $highestValue = max($otherKeys);
+
+        if(! $highestValue) {
+            throw new InvalidHandRankingException('No high card');
+        }
+
+        // Return the first card of the maximum value rank.
+        return $this->valueHistogram[$highestValue][0];
     }
 
     /**
@@ -308,7 +508,6 @@ class HandRanking
             $compareStraight = range($values[0], $values[0]-4);
             // If fiveCards is the same as the compareStraight that's been built, then a straight has been found
             if ($fiveCards === $compareStraight) {
-                // TODO: Put this line here or to isStraight()?
                 $this->foundStraight = $fiveCards;
                 return true;
             }
