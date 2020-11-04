@@ -6,7 +6,7 @@ use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Exceptions\InvalidHandRankingException;
 
 class HandRanking
-{
+{     
     /**
      * The cards given for the hand ranking
      * 
@@ -325,7 +325,7 @@ class HandRanking
         elseif ($this->isStraight())
         {
             // Loop through the foundStraight and return the first Card at valueIndex
-            $this->hand = array_map(fn($valueIndex) => $this->valueHistogram[$valueIndex][0], $this->foundStraight);
+            $this->hand = array_map(fn($valueIndex) => $this->sortedValues[$valueIndex][0], $this->foundStraight);
             $this->rank = 5;
             $this->description = 'Straight, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue();
         }

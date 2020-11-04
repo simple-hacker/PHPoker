@@ -206,7 +206,7 @@ class HandRankingTest extends TestCase
     public function straights()
     {
         return [
-            ['AhTsQcJcKd', true], // AKQJT Broadway straight, A high
+            // ['AhTsQcJcKd', true], // AKQJT Broadway straight, A high
             ['7hAh5s3c2c4d', true], // 54321 Wheel straight, A low
             ['8h9s6c7cTs', true], // T9876
             ['3s4s5s6s2s7h8d', true], // 87654(32)
