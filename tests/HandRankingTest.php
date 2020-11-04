@@ -339,4 +339,3 @@ class HandRankingTest extends TestCase
         ];
     }
 }
-

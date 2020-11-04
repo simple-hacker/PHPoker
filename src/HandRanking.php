@@ -310,9 +310,9 @@ class HandRanking
         elseif ($this->isFourOfAKind())
         {
             $fourOfAKind = array_slice(reset($this->valueHistogram), 0, 4);
-            $valueHistogramKeys = array_keys($this->valueHistogram);
-            $notIncluding = array_splice($valueHistogramKeys, 0, 1);
-            $highestCard = $this->getHighCard($notIncluding);
+            // Get the best card after removing top 1 of histogram (four of a kind is the top of value histogram)
+            $withoutTopN = 1;
+            $highestCard = $this->getHighCard($withoutTopN);
             $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
             $this->hand = $fourOfAKind;
             $this->rank = 8;
@@ -346,9 +346,9 @@ class HandRanking
         elseif ($this->isTwoPair())
         {
             $twoPair = array_merge(array_slice(reset($this->valueHistogram), 0, 2), array_slice(next($this->valueHistogram), 0, 2));
-            $valueHistogramKeys = array_keys($this->valueHistogram);
-            $notIncluding = array_splice($valueHistogramKeys, 0, 2);
-            $highestCard = $this->getHighCard($notIncluding);
+            // Get the best card after removing top 2 of histogram (Two pair is the top two of value histogram)
+            $withoutTopN = 2;
+            $highestCard = $this->getHighCard($withoutTopN);
             $twoPair[] = $highestCard; // Append highestCard to twoPair
             $this->hand = $twoPair;
             $this->rank = 3;
@@ -391,19 +391,25 @@ class HandRanking
     /**
     * Returns the next highest card rank excluding certains values
     * This is needed for Four of a Kind and Two Pair
-    * valueHistogram for 7sJs9dJc7hJhJdAh would be J=4, 7=2, A=1, 9=1
+    * valueHistogram for 7sJsJc7hJhJdAh would be J=4, 7=2, A=1
     * Best hand is JJJJA and not JJJJ7 so we can't just get the second value of the histogram
     * Similary if three pairs are given but best hand is two pair
-    * valueHistogram for 7sJs9dKc7hKhJdAh would be K=2, J=2, 7=2, A=1, 9=1
+    * valueHistogram for 7sJsKc7hKhJdAh would be K=2, J=2, 7=2, A=1
     * Best hand is KKJJA and not KKJJ7
     * 
+    * @param array $valueHistogramKeys
     * @param array $notIncluding
     * @return Card
     */
-    private function getHighCard(array $notIncluding): Card
+    private function getHighCard(int $removeTopN = 0): Card
     {
+        if(! ($removeTopN == 1 || $removeTopN == 2)) {
+            throw new InvalidHandRankingException('Removing too many cards to determine best high card');
+        }
+
         $valueHistogramKeys = array_keys($this->valueHistogram);
-        $otherKeys = array_diff($valueHistogramKeys, $notIncluding);
+        // Remove the first N elements
+        $otherKeys = array_splice($valueHistogramKeys, $removeTopN);
         $highestValue = max($otherKeys);
 
         if(! $highestValue) {
