@@ -1,4 +1,0 @@
-☐ Card::create
-    - So to compare two of the same object/card
-    - If correct then change all ContainEquals to Contains
-    This is because it's STATIC??
