@@ -132,6 +132,15 @@ class HandRanking
         return $this->cards;
     }
 
+    /**
+    * Returns the protected array of best hand cards 
+    *
+    * @return array
+    */
+    public function getHand(): Array
+    {
+        return $this->hand;
+    }
 
     /**
     * Returns short values description of the best hand found
@@ -164,7 +173,6 @@ class HandRanking
     {
         return $this->rank;
     }
-
 
     /**
     * Returns the protected array of cards grouped and sorted by value
@@ -451,8 +459,8 @@ class HandRanking
     */
     public function isFourOfAKind(): Bool
     {
-        $values = array_values($this->valueHistogram);
-        return (count($values[0]) === 4 && count($values[1]) >= 1);
+        return (count(reset($this->valueHistogram)) === 4
+                && count(next($this->valueHistogram)) >= 1);
     }
 
     /**
@@ -464,8 +472,8 @@ class HandRanking
     */
     public function isFullHouse(): Bool
     {
-        $values = array_values($this->valueHistogram);
-        return (count($values[0]) === 3 && count($values[1]) >= 2);
+        return (count(reset($this->valueHistogram)) === 3
+                && count(next($this->valueHistogram)) >= 2);
     }
 
     /**
@@ -528,8 +536,9 @@ class HandRanking
     */
     public function isThreeOfAKind(): Bool
     {
-        $values = array_values($this->valueHistogram);
-        return (count($values[0]) === 3 && count($values[1]) === 1 && count($values[2]) === 1);
+        return (count(reset($this->valueHistogram)) === 3
+                && count(next($this->valueHistogram)) === 1
+                && count(next($this->valueHistogram)) === 1);
     }
 
     /**
@@ -541,8 +550,9 @@ class HandRanking
     */
     public function isTwoPair(): Bool
     {
-        $values = array_values($this->valueHistogram);
-        return (count($values[0]) === 2 && count($values[1]) === 2 && count($values[2]) >= 1);
+        return (count(reset($this->valueHistogram)) === 2
+                && count(next($this->valueHistogram)) === 2
+                && count(next($this->valueHistogram)) >= 1);
     }
 
     /**
@@ -554,8 +564,10 @@ class HandRanking
     */
     public function isOnePair(): Bool
     {
-        $values = array_values($this->valueHistogram);
-        return (count($values[0]) === 2 && count($values[1]) === 1 && count($values[2]) === 1 && count($values[3]) === 1);
+        return (count(reset($this->valueHistogram)) === 2
+                && count(next($this->valueHistogram)) === 1
+                && count(next($this->valueHistogram)) === 1
+                && count(next($this->valueHistogram)) === 1);
     }
 
     /**
@@ -566,7 +578,10 @@ class HandRanking
     */
     public function isHighCard(): Bool
     {
-        $values = array_values($this->valueHistogram);
-        return (count($values[0]) === 1 && count($values[1]) === 1 && count($values[2]) === 1 && count($values[3]) === 1 && count($values[4]) === 1);
+        return (count(reset($this->valueHistogram)) === 1
+                && count(next($this->valueHistogram)) === 1
+                && count(next($this->valueHistogram)) === 1
+                && count(next($this->valueHistogram)) === 1
+                && count(next($this->valueHistogram)) === 1);
     }
 }
