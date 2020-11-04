@@ -26,10 +26,12 @@ class DeckTest extends TestCase
 
         $firstCard = $deck->cards[0];
 
-        $deck->takeCard();
+        $card = $deck->takeCard();
 
         $this->assertNotContainsEquals($firstCard, $deck->cards);
         $this->assertEquals(51, $deck->count());
+        $this->assertInstanceOf(Card::class, $card);
+        $this->assertEquals($firstCard, $card);
     }
 
     /** @test */
@@ -39,10 +41,24 @@ class DeckTest extends TestCase
 
         $fourHearts = new Card('4h');
 
-        $deck->takeCard($fourHearts);
+        $card = $deck->takeCard($fourHearts);
 
         $this->assertNotContainsEquals($fourHearts, $deck->cards);
         $this->assertEquals(51, $deck->count());
+        $this->assertInstanceOf(Card::class, $card);
+        $this->assertEquals($fourHearts, $card);
+    }
+
+    /** @test */
+    public function can_take_a_number_of_cards_from_the_deck()
+    {
+        $deck = new Deck();
+
+        // Take 5 cards from the deck
+        $cards = $deck->takeCards(5);
+
+        $this->assertEquals(47, $deck->count());
+        $this->assertContainsOnlyInstancesOf(Card::class, $cards);
     }
 
     /** @test */

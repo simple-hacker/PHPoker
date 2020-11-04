@@ -70,22 +70,49 @@ class Deck
     * Take a specific card from anywhere in the deck if found
     * 
     * @param Card $card
-    * @return void
+    * @return Card
     */
-    public function takeCard(Card $card = null)
+    public function takeCard(Card $card = null): Card
     {
         if (! $card) {
-            array_shift($this->cards);
+            return array_shift($this->cards);
         } else {
             
             $findCard = array_search($card, $this->cards);
             
             if ($findCard !== false) {
+                $card = $this->cards[$findCard];
                 array_splice($this->cards, $findCard, 1);
+                return $card;
             } else {
                 $cardDescription = $card->getDescription();
                 throw new InvalidDeckOperationException("$cardDescription not found in deck");
             }
         }
+    }
+
+    /**
+    * Take and return a number of cards from the deck
+    * 
+    * @param int $n
+    * @return array
+    */
+    public function takeCards($n = 1): Array
+    {
+        $cards = [];
+
+        if ($n < 1) {
+            $n = 1;
+        }
+
+        if ($n > count($this->cards)) {
+            throw new InvalidDeckOperationException("Not enough cards in deck to remove $n cards");
+        }
+
+        for ($i = 0; $i < $n; $i++) {
+            $cards[] = $this->takeCard();
+        }
+
+        return $cards;
     }
 }
