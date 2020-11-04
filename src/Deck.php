@@ -101,9 +101,7 @@ class Deck
     {
         $cards = [];
 
-        if ($n < 1) {
-            $n = 1;
-        }
+        if ($n < 1) $n = 1;
 
         if ($n > count($this->cards)) {
             throw new InvalidDeckOperationException("Not enough cards in deck to remove $n cards");

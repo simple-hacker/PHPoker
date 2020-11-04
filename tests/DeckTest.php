@@ -62,6 +62,17 @@ class DeckTest extends TestCase
     }
 
     /** @test */
+    public function cannot_remove_more_cards_than_there_are_in_the_deck()
+    {
+        $this->expectException(InvalidDeckOperationException::class);
+
+        $deck = new Deck();
+
+        // Take 53 cards from the deck
+        $cards = $deck->takeCards(53);
+    }
+
+    /** @test */
     public function cannot_take_card_if_not_found_in_deck()
     {
         // TODO: Instead of exception maybe just return false?
