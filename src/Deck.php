@@ -7,8 +7,18 @@ use simplehacker\PHPoker\Exceptions\InvalidDeckOperationException;
 
 class Deck
 {
-    public $cards = [];
+    /**
+     * The deck's cards
+     * 
+     * @var array
+     */
+    protected $cards = [];
 
+    /**
+     * The card limit of the deck
+     * 
+     * @var const
+     */
     const CARD_LIMIT = 52;
 
     /**
@@ -30,6 +40,16 @@ class Deck
         if ($shuffle) {
             shuffle($this->cards);
         }
+    }
+
+    /**
+    * Returns the cards in the deck
+    * 
+    * @return array
+    */
+    public function getCards(): Array
+    {
+        return $this->cards;
     }
 
     /**
@@ -69,12 +89,12 @@ class Deck
     * or
     * Take a specific card from anywhere in the deck if found
     * 
-    * @param Card $card
+    * @param Card|null $card
     * @return Card
     */
     public function takeCard(Card $card = null): Card
     {
-        if (! $card) {
+        if (is_null($card)) {
             return array_shift($this->cards);
         } else {
             
@@ -99,17 +119,13 @@ class Deck
     */
     public function takeCards($n = 1): Array
     {
-        $cards = [];
-
         if ($n < 1) $n = 1;
 
         if ($n > count($this->cards)) {
             throw new InvalidDeckOperationException("Not enough cards in deck to remove $n cards");
         }
 
-        for ($i = 0; $i < $n; $i++) {
-            $cards[] = $this->takeCard();
-        }
+        $cards = array_splice($this->cards, 0, $n);
 
         return $cards;
     }

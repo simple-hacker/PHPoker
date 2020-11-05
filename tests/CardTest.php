@@ -9,14 +9,6 @@ use simplehacker\PHPoker\Exceptions\InvalidCardException;
 
 class CardTest extends TestCase
 {
-    /** @test */
-    public function test()
-    {
-        $card = new Card('Jh');
-
-        $this->assertEquals(11, $card->getValueRank());
-    }
-
     /**
     * @test
     * @dataProvider values
@@ -25,7 +17,7 @@ class CardTest extends TestCase
     {
         $card = new Card($testValue, 'spades');
 
-        $this->assertEquals($value, $card->getValue());
+        $this->assertSame($value, $card->getValue());
         $this->assertEquals($shortValue, $card->getShortValue());
         $this->assertEquals($valueRank, $card->getValueRank());
     }
@@ -38,7 +30,7 @@ class CardTest extends TestCase
     {
         $card = new Card('A', $testSuit);
 
-        $this->assertEquals($suit, $card->getSuit());
+        $this->assertSame($suit, $card->getSuit());
         $this->assertEquals($shortSuit, $card->getShortSuit());
         $this->assertEquals($suitRank, $card->getSuitRank());
     }
@@ -51,7 +43,7 @@ class CardTest extends TestCase
     {
         $card = new Card($value, $suit);
 
-        $this->assertEquals($card->getDescription(), $description);
+        $this->assertSame($card->getDescription(), $description);
     }
 
     /**
@@ -62,7 +54,7 @@ class CardTest extends TestCase
     {
         $card = new Card($value, $suit);
 
-        $this->assertEquals($card->getShortDescription(), $description);
+        $this->assertSame($card->getShortDescription(), $description);
     }
 
     /**
@@ -84,8 +76,8 @@ class CardTest extends TestCase
     {
         $card = new Card($shortValue);
 
-        $this->assertEquals($card->getValue(), $value);
-        $this->assertEquals($card->getSuit(), $suit);
+        $this->assertSame($card->getValue(), $value);
+        $this->assertSame($card->getSuit(), $suit);
         $this->assertEquals($card->getValueRank(), $valueRank);
         $this->assertEquals($card->getSuitRank(), $suitRank);
     }

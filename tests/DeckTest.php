@@ -15,8 +15,9 @@ class DeckTest extends TestCase
     {
         $deck = new Deck();
         
-        $this->assertCount(52, $deck->cards);
+        $this->assertCount(52, $deck->getCards());
         $this->assertSame(52, $deck->count());
+        $this->assertContainsOnlyInstancesOf(Card::class, $deck->getCards());
     }
 
     /** @test */
@@ -24,12 +25,12 @@ class DeckTest extends TestCase
     {
         $deck = new Deck();
 
-        $firstCard = $deck->cards[0];
+        $firstCard = $deck->getCards()[0];
 
         $card = $deck->takeCard();
 
-        $this->assertNotContainsEquals($firstCard, $deck->cards);
-        $this->assertEquals(51, $deck->count());
+        $this->assertNotContainsEquals($firstCard, $deck->getCards());
+        $this->assertSame(51, $deck->count());
         $this->assertInstanceOf(Card::class, $card);
         $this->assertEquals($firstCard, $card);
     }
@@ -43,8 +44,8 @@ class DeckTest extends TestCase
 
         $card = $deck->takeCard($fourHearts);
 
-        $this->assertNotContainsEquals($fourHearts, $deck->cards);
-        $this->assertEquals(51, $deck->count());
+        $this->assertNotContainsEquals($fourHearts, $deck->getCards());
+        $this->assertSame(51, $deck->count());
         $this->assertInstanceOf(Card::class, $card);
         $this->assertEquals($fourHearts, $card);
     }
@@ -57,8 +58,21 @@ class DeckTest extends TestCase
         // Take 5 cards from the deck
         $cards = $deck->takeCards(5);
 
-        $this->assertEquals(47, $deck->count());
-        $this->assertContainsOnlyInstancesOf(Card::class, $cards);
+        $this->assertSame(47, $deck->count());
+    }
+
+    /** @test */
+    public function removing_negative_or_zero_cards_only_removes_one_card()
+    {
+        $deck = new Deck();
+
+        // 0 = 1
+        $cards = $deck->takeCards(0);
+        $this->assertSame(51, $deck->count());
+
+        // 0 = 1
+        $cards = $deck->takeCards(-1);
+        $this->assertSame(50, $deck->count());
     }
 
     /** @test */
@@ -75,8 +89,6 @@ class DeckTest extends TestCase
     /** @test */
     public function cannot_take_card_if_not_found_in_deck()
     {
-        // TODO: Instead of exception maybe just return false?
-
         $this->expectException(InvalidDeckOperationException::class);
 
         $deck = new Deck();
@@ -85,7 +97,7 @@ class DeckTest extends TestCase
 
         // Remove from deck
         $deck->takeCard($fourHearts);
-        $this->assertNotContainsEquals($fourHearts, $deck->cards);
+        $this->assertNotContainsEquals($fourHearts, $deck->getCards());
 
         // Try to remove 4h again, exception is thrown
         $deck->takeCard($fourHearts);
@@ -111,10 +123,10 @@ class DeckTest extends TestCase
         $fiveSpades = new Card('5', 'spades');
 
         $deck->takeCard($fiveSpades);
-        $this->assertNotContainsEquals($fiveSpades, $deck->cards);
+        $this->assertNotContainsEquals($fiveSpades, $deck->getCards());
         
         $deck->addCard($fiveSpades);
-        $this->assertContainsEquals($fiveSpades, $deck->cards);
+        $this->assertContainsEquals($fiveSpades, $deck->getCards());
     }
 
     /** @test */
@@ -127,10 +139,10 @@ class DeckTest extends TestCase
         $fiveDiamonds = new Card(5, 'Diamonds');
         
         // Assert it is in the deck
-        $this->assertContainsEquals($fiveDiamonds, $deck->cards);
+        $this->assertContainsEquals($fiveDiamonds, $deck->getCards());
 
         // Try to add card again, expect exception
         $deck->addCard($fiveDiamonds);
-        $this->assertContainsEquals($fiveDiamonds, $deck->cards);
+        $this->assertContainsEquals($fiveDiamonds, $deck->getCards());
     }
 }
