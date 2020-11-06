@@ -25,7 +25,7 @@ class Player
         // Make sure each element of the array is an instanceof Card
         foreach ($cards as $card) {
             if (! ($card instanceof Card)) {
-                throw new InvalidPlayerOperationException('Array must only contains instances of Card');
+                throw new InvalidPlayerOperationException('Array must only contain instances of Card');
             }
         }
 
@@ -52,5 +52,15 @@ class Player
     public function getHoleCards(): Array
     {
         return $this->holeCards;
+    }
+
+    /**
+    * Returns the player's number of hole cards.
+    * 
+    * @return integer
+    */
+    public function getHoleCardsCount(): Int
+    {
+        return count($this->holeCards);
     }
 }

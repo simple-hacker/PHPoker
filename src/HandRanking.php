@@ -105,7 +105,7 @@ class HandRanking
 
         if (count($uniqueCards) != count($this->cards)) {
             $duplicateCards = array_diff_assoc($this->cards, $uniqueCards);
-            $invalidCards = implode(", ", $duplicateCards);
+            $invalidCards = implode(", ", $duplicateCards); // Uses magic __toString for short card description
             throw new InvalidHandRankingException("Duplicate cards given: $invalidCards");
         }
 
@@ -179,7 +179,6 @@ class HandRanking
     *
     * @return array
     */
-
     public function getValueHistogram(): Array
     {
         return $this->valueHistogram;
