@@ -113,6 +113,20 @@ class NoLimitHoldemTest extends TestCase
     }
 
     /** @test */
+    public function cannot_deal_flop_twice_in_a_row()
+    {
+        $this->expectException(InvalidActionException::class);
+
+        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+
+        $hand = new NoLimitHoldem($players);
+
+        $hand->deal();
+        $hand->flop();
+        $hand->flop();
+    }
+
+    /** @test */
     public function a_turn_can_be_dealt_if_flop_has_been_dealt()
     {
         $players = array_map(fn() => new Player(), array_fill(0, 4, null));
@@ -138,6 +152,21 @@ class NoLimitHoldemTest extends TestCase
 
         $hand->deal();
         // Do not deal flop
+        $hand->turn();
+    }
+
+    /** @test */
+    public function cannot_deal_turn_twice_in_a_row()
+    {
+        $this->expectException(InvalidActionException::class);
+
+        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+
+        $hand = new NoLimitHoldem($players);
+
+        $hand->deal();
+        $hand->flop();
+        $hand->turn();
         $hand->turn();
     }
 
@@ -170,35 +199,6 @@ class NoLimitHoldemTest extends TestCase
         $hand->flop();
         // Do not deal turn
         $hand->river();
-    }
-
-    /** @test */
-    public function cannot_deal_flop_twice_in_a_row()
-    {
-        $this->expectException(InvalidActionException::class);
-
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
-
-        $hand = new NoLimitHoldem($players);
-
-        $hand->deal();
-        $hand->flop();
-        $hand->flop();
-    }
-
-    /** @test */
-    public function cannot_deal_turn_twice_in_a_row()
-    {
-        $this->expectException(InvalidActionException::class);
-
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
-
-        $hand = new NoLimitHoldem($players);
-
-        $hand->deal();
-        $hand->flop();
-        $hand->turn();
-        $hand->turn();
     }
 
     /** @test */

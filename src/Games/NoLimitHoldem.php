@@ -35,21 +35,21 @@ class NoLimitHoldem
      * 
      * @var Deck
      */
-    private $deck;
+    protected $deck;
 
     /**
      * The community cards of the hand
      * 
      * @var array
      */
-    private $communityCards = [];
+    protected $communityCards = [];
 
     /**
      * Boolean if the hand has already been dealt to players
      * 
      * @var bool
      */
-    private $dealt = false;
+    protected $dealt = false;
 
     /**
     * Instantiate the NoLimitHoldem class
@@ -92,7 +92,7 @@ class NoLimitHoldem
     * @param int $numberofCards
     * @return void
     */
-    private function giveCardsToPlayer(Player $player, int $numberOfCards = 1)
+    protected function giveCardsToPlayer(Player $player, int $numberOfCards = 1)
     {
         if (($player->getHoleCardsCount() + $numberOfCards) > self::HOLE_CARD_LIMIT) {
             throw new HandException('Player will exceed the hole card limit');
@@ -109,7 +109,7 @@ class NoLimitHoldem
     * @param int $numberofCards
     * @return void
     */
-    private function addCommunityCards(int $numberOfCards = 1)
+    protected function addCommunityCards(int $numberOfCards = 1)
     {
         $cards = $this->deck->takeCards($numberOfCards);
 
