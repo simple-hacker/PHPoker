@@ -2,13 +2,13 @@
 
 namespace simplehacker\PHPoker\Tests;
 
-use PHPUnit\Framework\TestCase;
 use simplehacker\PHPoker\Player;
 use simplehacker\PHPoker\Games\NoLimitHoldem;
+use simplehacker\PHPoker\Tests\PHPokerTestCase;
 use simplehacker\PHPoker\Exceptions\HandException;
 use simplehacker\PHPoker\Exceptions\InvalidActionException;
 
-class NoLimitHoldemTest extends TestCase
+class NoLimitHoldemTest extends PHPokerTestCase
 {
     /** @test */
     public function must_give_an_array_of_players_when_instantiating()

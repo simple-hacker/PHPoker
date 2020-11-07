@@ -20,7 +20,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "simplehacker\\PHPoker\\Tests\\": "test/"
+            "simplehacker\\PHPoker\\Tests\\": "tests/"
         }
     }
 }

@@ -3,12 +3,11 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
-
-use PHPUnit\Framework\TestCase;
 use simplehacker\PHPoker\Player;
+use simplehacker\PHPoker\Tests\PHPokerTestCase;
 use simplehacker\PHPoker\Exceptions\InvalidPlayerOperationException;
 
-class PlayerTest extends TestCase
+class PlayerTest extends PHPokerTestCase
 {
     /** @test */
     public function a_player_can_be_given_cards()
