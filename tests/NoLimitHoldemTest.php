@@ -36,7 +36,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
         $this->expectException(HandException::class);
 
         // Create 11 Players
-        $players = array_map(fn() => new Player(), array_fill(0, 11, null));
+        $players = $this->createPlayers(11);
 
         $hand = new NoLimitHoldem($players);
     }
@@ -45,7 +45,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     public function can_get_the_players_of_the_hand()
     {
         // Create 8 Players
-        $players = array_map(fn() => new Player(), array_fill(0, 8, null));
+        $players = $this->createPlayers(8);
         $hand = new NoLimitHoldem($players);
 
         $this->assertSame(8, count($hand->getPlayers()));
@@ -56,7 +56,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         // No limit Holdem can only have two cards each.
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -74,7 +74,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         $this->expectException(InvalidActionException::class);
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -87,7 +87,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     /** @test */
     public function a_flop_can_be_dealt()
     {
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -103,7 +103,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         $this->expectException(InvalidActionException::class);
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -117,7 +117,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         $this->expectException(InvalidActionException::class);
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -129,7 +129,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     /** @test */
     public function a_turn_can_be_dealt_if_flop_has_been_dealt()
     {
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -146,7 +146,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         $this->expectException(InvalidActionException::class);
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -160,7 +160,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         $this->expectException(InvalidActionException::class);
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -173,7 +173,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     /** @test */
     public function a_river_can_be_dealt_if_flop_and_turn_have_been_dealt()
     {
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -191,7 +191,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         $this->expectException(InvalidActionException::class);
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
@@ -206,7 +206,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         $this->expectException(InvalidActionException::class);
 
-        $players = array_map(fn() => new Player(), array_fill(0, 4, null));
+        $players = $this->createPlayers(4);
 
         $hand = new NoLimitHoldem($players);
 
