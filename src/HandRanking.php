@@ -31,6 +31,20 @@ class HandRanking
     protected $rank = 0;
 
     /**
+     * The hand type rank values
+     */
+    const ROYAL_FLUSH_RANK      = 10;
+    const STRAIGHT_FLUSH_RANK   = 9;
+    const FOUR_OF_A_KIND_RANK   = 8;
+    const FULL_HOUSE_RANK       = 7;
+    const FLUSH_RANK            = 6;
+    const STRAIGHT_RANK         = 5;
+    const THREE_OF_A_KIND_RANK  = 4;
+    const TWO_PAIR_RANK         = 3;
+    const ONE_PAIR_RANK         = 2;
+    const HIGH_CARD_RANK        = 1;
+
+    /**
      * The hand ranking's kicker value if set
      * When compairing hand rankings, if a kicker plays then this value is set
      * And is used when generating a description to include the kicker that plays
@@ -331,13 +345,13 @@ class HandRanking
         if ($this->isRoyalFlush())
         {
             $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->rank = 10;
+            $this->rank = self::ROYAL_FLUSH_RANK;
             $this->description = 'Royal Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
         }
         elseif ($this->isStraightFlush())
         {
             $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->rank = 9;
+            $this->rank = self::STRAIGHT_FLUSH_RANK;
             $this->description = 'Straight Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
         }
         elseif ($this->isFourOfAKind())
@@ -348,32 +362,32 @@ class HandRanking
             $highestCard = $this->getHighCard($withoutTopN);
             $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
             $this->hand = $fourOfAKind;
-            $this->rank = 8;
+            $this->rank = self::FOUR_OF_A_KIND_RANK;
             $this->description = 'Four of a Kind, ' . $this->hand[0]->getValue() . 's';
         }
         elseif ($this->isFullHouse())
         {
             $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 2));
-            $this->rank = 7;
+            $this->rank = self::FULL_HOUSE_RANK;
             $this->description = 'Full House, ' . $this->hand[0]->getValue() . 's full of ' . $this->hand[3]->getValue() . 's';
         }
         elseif ($this->isFlush())
         {
             $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->rank = 6;
+            $this->rank = self::FLUSH_RANK;
             $this->description = 'Flush, ' . $this->hand[0]->getValue() . ' high of ' . $this->hand[0]->getSuit();
         }
         elseif ($this->isStraight())
         {
             // Loop through the foundStraight and return the first Card at valueIndex
             $this->hand = array_map(fn($valueIndex) => $this->sortedValues[$valueIndex][0], $this->foundStraight);
-            $this->rank = 5;
+            $this->rank = self::STRAIGHT_RANK;
             $this->description = 'Straight, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue();
         }
         elseif ($this->isThreeOfAKind())
         {
             $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 1), array_slice(next($this->valueHistogram), 0, 1));
-            $this->rank = 4;
+            $this->rank = self::THREE_OF_A_KIND_RANK;
             $this->description = 'Three of a Kind, ' . $this->hand[0]->getValue() .'s';
         }
         elseif ($this->isTwoPair())
@@ -384,7 +398,7 @@ class HandRanking
             $highestCard = $this->getHighCard($withoutTopN);
             $twoPair[] = $highestCard; // Append highestCard to twoPair
             $this->hand = $twoPair;
-            $this->rank = 3;
+            $this->rank = self::TWO_PAIR_RANK;
             $this->description = 'Two Pair, ' . $this->hand[0]->getValue() .'s and ' . $this->hand[2]->getValue() .'s';
         }
         elseif ($this->isOnePair())
@@ -395,7 +409,7 @@ class HandRanking
                                 array_slice(next($this->valueHistogram), 0, 1),
                                 array_slice(next($this->valueHistogram), 0, 1)
                         );
-            $this->rank = 2;
+            $this->rank = self::ONE_PAIR_RANK;
             $this->description = 'One Pair, ' . $this->hand[0]->getValue() .'s';
         }
         elseif ($this->isHighCard())
@@ -407,7 +421,7 @@ class HandRanking
                                 array_slice(next($this->valueHistogram), 0, 1),
                                 array_slice(next($this->valueHistogram), 0, 1)
                         );
-            $this->rank = 1;
+            $this->rank = self::HIGH_CARD_RANK;
             $this->description = 'High Card, ' . $this->hand[0]->getValue();
         }
         

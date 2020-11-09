@@ -247,28 +247,22 @@ class NoLimitHoldem
             // e.g. in the same high card, the kickers start from the 2nd card
             // e.g. in the same high card flush, the kickers start from the 2nd card
             switch($bestHandRank) {
-                case 1:
-                    // High Card
+                case HandRanking::HIGH_CARD_RANK:
                     $kickerFromValue = 2;
                     break;
-                case 2:
-                    // One pair
+                case HandRanking::ONE_PAIR_RANK:
                     $kickerFromValue = 3;
                     break;
-                case 3:
-                    // Two pair
+                case HandRanking::TWO_PAIR_RANK:
                     $kickerFromValue = 5;
                     break;
-                case 4:
-                    // Three of a kind
+                case HandRanking::THREE_OF_A_KIND_RANK:
                     $kickerFromValue = 4;
                     break;
-                case 6:
-                    // Flush
+                case HandRanking::FLUSH_RANK:
                     $kickerFromValue = 2;
                     break;
-                case 8:
-                    // Four of a kind
+                case HandRanking::FOUR_OF_A_KIND_RANK:
                     $kickerFromValue = 5;
                     break;
                 default:
