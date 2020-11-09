@@ -31,6 +31,15 @@ class HandRanking
     protected $rank = 0;
 
     /**
+     * The hand ranking's kicker value if set
+     * When compairing hand rankings, if a kicker plays then this value is set
+     * And is used when generating a description to include the kicker that plays
+     * 
+     * @var Card
+     */
+    protected $kickerCard;
+
+    /**
      * The hand ranking short description
      * e.g. Kh9c6h4s3d
      * 
@@ -167,13 +176,26 @@ class HandRanking
 
     /**
     * Returns the description of the best hand found
+    * with kickerDescription if it exists
     * e.g. Four of a Kind, Jacks
     *
     * @return string
     */
     public function getDescription(): string
     {
-        return $this->description;
+        return (! $this->kickerCard) ? $this->description : $this->description . ", with " . $this->kickerCard->getValue() . " kicker";
+    }
+
+    /**
+    * If the hand ranking has a kicker when compared to another hand
+    * Set this to the value rank of this kicker
+    *
+    * @param Card $kickerCard
+    * @return void
+    */
+    public function setKicker(Card $kickerCard): void
+    {
+        $this->kickerCard = $kickerCard;
     }
 
     /**

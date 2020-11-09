@@ -14,6 +14,13 @@ class Player
     protected $holeCards = [];
 
     /**
+     * The player's HandRanking class object
+     * 
+     * @var HandRanking
+     */
+    protected $handRanking;
+
+    /**
     * Assign an array of Card's to the player's hole cards
     * Each element of the array must be an instance of Card
     * 
@@ -62,5 +69,29 @@ class Player
     public function getHoleCardsCount(): Int
     {
         return count($this->holeCards);
+    }
+
+    /**
+    * Sets the player's HandRanking class object
+    * 
+    * @return void
+    */
+    public function setHandRanking(HandRanking $handRanking): void
+    {
+        $this->handRanking = $handRanking;
+    }
+
+    /**
+    * Returns the player's HandRanking class object
+    * 
+    * @return HandRanking
+    */
+    public function getHandRanking(): HandRanking
+    {
+        if (! $this->handRanking) {
+            throw new InvalidPlayerOperationException('Hand ranking has not been generated yet');
+        }
+
+        return $this->handRanking;
     }
 }
