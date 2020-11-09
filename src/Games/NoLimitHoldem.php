@@ -233,7 +233,7 @@ class NoLimitHoldem
         });
 
         // If the count of handRankings is greater than one, then there are at least two players with the same type of hand
-        // e.g. two straights
+        // e.g. three straights
         // Filter out handRankings according to kickers
         if (count($handRankings) > 1) {
 
@@ -255,7 +255,7 @@ class NoLimitHoldem
                 // Get the max of [13, 12, 13] = 13
                 $bestCurrentKickerValue = max($currentKickerValues);
                 
-                // Filter out handRankings where the current card of best hand at index kickerIndex
+                // Filter out handRankings where the card of best hand at index kickerIndex
                 // is not the $bestCurrentKickerValue = 13
                 $handRankings = array_filter($handRankings, function($handRank) use ($kickerIndex, $bestCurrentKickerValue) {
                     return $handRank->getHand()[$kickerIndex]->getValueRank() === $bestCurrentKickerValue;
@@ -270,8 +270,8 @@ class NoLimitHoldem
 
         // handRankings now only contains the best possible handRanking, including finding kickers if needed
         // handRanking keys are index of $this->players to which the handRanking belongs to
-        // Return the inersection of $this->players which have a key belonging to keys in handRankings
-        // This will return multiple Players is there is a chopped pot
+        // Return the intersection of $this->players which have a key belonging to keys in handRankings
+        // This will return multiple Players if there is a chopped pot
 
         // In the above example, Player 0 and Player 3 have the same exact hand KQJT9
         // handRanking keys will be [0, 3]

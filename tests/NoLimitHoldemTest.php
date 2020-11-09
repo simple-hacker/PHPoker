@@ -264,6 +264,18 @@ class NoLimitHoldemTest extends PHPokerTestCase
         // [Array of community card values], [Array of players which holds an array of hole card values], [Keys of players expected to win]
         return [
             [['Ah', '3s', 'Kd', '9d', 'Qs'], [['4s', '5c'], ['9s', 'Td'], ['5s', '5d'], ['9c', 'Tc']], [1, 3]], // Players 1 and 3 = AKQJT straight
+            [['Ah', 'Js', 'Qd', 'Tc', 'Kd'], [['9c', 'Td'], ['4c', '4d'], ['8h', '8d']], [0, 1, 2]], // 3 way chop pot playing board
+            [['Ah', '9s', '9h', '9c', 'Kh'], [['9d', 'Qd'], ['4h', '4c'], ['Qh', 'Th']], [0]], // 9999A > 99944 > AKQT9h
+            [['Ah', '9s', '9h', '9c', 'Kh'], [['4h', '5h'], ['Qh', 'Th']], [1]], // AK954h < AKQT9h
+            [['6h', '6s', '6d', '4c', '7h'], [['Kh', 'Qh'], ['Ad', 'Kc'], ['Jc', 'Ah']], [1]], // 666KQ < 666AK
+            [['6h', '5s', '3d', '2c', 'Ah'], [['4h', '7h'], ['Ad', '4c']], [0]], // 765432 > 65432
+            [['Kh', 'Ks', 'Kd', 'Ac', 'Qh'], [['9d', '9c'], ['Th', 'Tc']], [1]], // KKK99 < KKKTT
+            [['Kh', 'Ks', 'Qd', 'Qc', '4h'], [['9d', '9c'], ['Ah', 'Th']], [1]], // KKQQ9 < KKQQA
+            [['Kh', 'Ks', 'Qd', 'Qc', '4h'], [['9d', '9c'], ['Ah', 'Th'], ['Qh', 'Js']], [2]], // KKQQ9 < KKQQA < QQQKK
+            [['Kh', 'Ks', 'Qd', 'Qs', '4h'], [['Kc', 'Qc'], ['Qh', 'Js']], [0]], // KKKQQ > QQQKK
+            [['Kh', 'Ks', 'Qd', 'Qs', '4h'], [['Kc', 'Qc'], ['Qh', 'Kd']], [0, 1]], // KKKQQ = KKKQQ
+            [['Qh', 'Tc', '8d', '4s', '3c'], [['2d', '9d'], ['9h', '6s'], ['7h', '2h']], [1]], // QT984 < QT986 > QT874
+            [['8d', '6s', '3c', 'Qh', 'Tc'], [['7h', '2h'], ['2d', '9d'], ['9h', '5s']], [1, 2]], // QT876 < QT986 = QT986 
         ];
     }
 
