@@ -198,6 +198,12 @@ class NoLimitHoldem
     */
     public function getWinners(): Array
     {
+        // Cannot get winners if the river has not been dealt
+        // TODO: Also check that all betting ceases (when working with pots)
+        if (count($this->communityCards) !== 5) {
+            throw new InvalidActionException('Cannot get winners until there are five community cards');
+        }
+
         $handRankings = [];
         $bestHandRank = 0;
 

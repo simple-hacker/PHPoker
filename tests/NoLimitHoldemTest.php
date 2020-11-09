@@ -241,25 +241,43 @@ class NoLimitHoldemTest extends PHPokerTestCase
         $this->assertEquals($mappedPlayers, $hand->getPlayers());
     }
 
-    /** @test */
-    public function can_get_correct_winners_of_the_hand()
+    /**
+     * @test
+     * @dataProvider winners
+     * */
+    public function can_get_correct_winners_of_the_hand($communityCards, $players, $expectedWinnersKeys)
     {
-        $communityCards = ['Ah', '3s', 'Kd', '9d', 'Qs']; 
-        $playersWithHoleCards = [['4s', '5c'], ['9s', 'Td'], ['5s', '5d'], ['9c', 'Tc']];
-        $hand = $this->createNoLimitHoldemHand($communityCards, $playersWithHoleCards);
+        $hand = $this->createNoLimitHoldemHand($communityCards, $players);
 
-        $winners = $hand->getPlayers();
-        unset($winners[0], $winners[2]);
+        $allPlayers = $hand->getPlayers();
+        $winners = [];
 
-        // var_dump($hand->getWinners());
-        // die();
-        
+        foreach($expectedWinnersKeys as $playerKey) {
+            $winners[$playerKey] = $allPlayers[$playerKey];
+        }
+
         $this->assertEquals($winners, $hand->getWinners());
     }
 
-    // /** @test */
-    // public function cannot_get_winner_if_there_is_not_five_commmunity_cards()
-    // {
-        
-    // }
+    public function winners()
+    {
+        // [Array of community card values], [Array of players which holds an array of hole card values], [Keys of players expected to win]
+        return [
+            [['Ah', '3s', 'Kd', '9d', 'Qs'], [['4s', '5c'], ['9s', 'Td'], ['5s', '5d'], ['9c', 'Tc']], [1, 3]], // Players 1 and 3 = AKQJT straight
+        ];
+    }
+
+    /** @test */
+    public function cannot_get_winner_if_there_is_not_five_commmunity_cards()
+    {
+        $this->expectException(InvalidActionException::class);
+
+        // Only four communityCards
+        $communityCards = ['Ah', '3s', 'Kd', '9d'];
+        $players = [['4s', '5c'], ['9s', 'Td'], ['5s', '5d'], ['9c', 'Tc']];
+
+        $hand = $this->createNoLimitHoldemHand($communityCards, $players);
+
+        $hand->getWinners();
+    }
 }
