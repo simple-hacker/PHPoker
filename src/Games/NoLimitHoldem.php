@@ -6,6 +6,7 @@ use simplehacker\PHPoker\Deck;
 use simplehacker\PHPoker\Player;
 use simplehacker\PHPoker\Exceptions\HandException;
 use simplehacker\PHPoker\Exceptions\InvalidActionException;
+use simplehacker\PHPoker\HandRanking;
 
 class NoLimitHoldem
 {
@@ -188,5 +189,87 @@ class NoLimitHoldem
         }
 
         $this->addCommunityCards(1);
+    }
+
+    /**
+    * Returns an array of Players that won the hand.
+    * 
+    * @return array
+    */
+    public function getWinners(): Array
+    {
+        $handRankings = [];
+        $bestHandRank = 0;
+
+        // Loop through all players and combine communityCard with player's holeCards (allCards)
+        // Get the best hand for each player using allCards
+        // Get the hand ranking value of each handRank, setting the best hand rank value along the way
+        foreach ($this->players as $playerIndex => $player) {
+            $allCards = [...$this->communityCards, ...$player->getHoleCards()];
+            $handRank = new HandRanking($allCards);            
+            if ($handRank->getRank() > $bestHandRank) {
+                $bestHandRank = $handRank->getRank();
+            }
+            // Set the handRank to have the same index of the player in $this->players
+            $handRankings[$playerIndex] = $handRank;
+        }
+
+        // Filter out any handRankings that does not have the same rank value as bestHandRank
+        // e.g. Given three players
+        // Player 0 => Straight [K, Q, J, T, 9] (Rank 5)
+        // Player 1 => Two pair [K, K, Q, Q, 4] (Rank 3)
+        // Player 2 => Straight [Q, J, T, 9, 8] (Rank 5)
+        // Player 3 => Straight [K, Q, J, T, 9] (Rank 5)
+        // Then bestHandRank = 5
+        // Filter all handRankings where the getRank is not 5, so handRankings will only include the straights
+        $handRankings = array_filter($handRankings, function($handRank) use ($bestHandRank) {
+            return $handRank->getRank() === $bestHandRank;
+        });
+
+        // If the count of handRankings is greater than one, then there are at least two players with the same type of hand
+        // e.g. two straights
+        // Filter out handRankings according to kickers
+        if (count($handRankings) > 1) {
+
+            // Get array of best hand card values like below
+            // The indexes of kickers array are the indexes of $this->players
+            // Player 0 => [K, Q, J, T, 9]
+            // Player 2 => [Q, J, T, 9, 8]
+            // Player 3 => [K, Q, J, T, 9]
+            $kickers = array_map(fn($handRanking) => $handRanking->getKickers(), $handRankings);
+
+            // Loop through all five cards of each best hand and filter out according to best value
+            // at current index $kickerIndex
+            // If at any point there is only one handRanking then we have a solo winner so stop looping
+            for ($kickerIndex = 0; $kickerIndex < 5; $kickerIndex++) {
+
+                // Get the values of each $kickers at index kickerIndex
+                // e.g. first one will be [13, 12, 13] ([K, Q, K])
+                $currentKickerValues = array_column($kickers, $kickerIndex);
+                // Get the max of [13, 12, 13] = 13
+                $bestCurrentKickerValue = max($currentKickerValues);
+                
+                // Filter out handRankings where the current card of best hand at index kickerIndex
+                // is not the $bestCurrentKickerValue = 13
+                $handRankings = array_filter($handRankings, function($handRank) use ($kickerIndex, $bestCurrentKickerValue) {
+                    return $handRank->getHand()[$kickerIndex]->getValueRank() === $bestCurrentKickerValue;
+                });
+
+                // If there is only one handRanking then we have a solo winner
+                if (count($handRankings) === 1) {
+                    break;
+                }
+            }
+        }
+
+        // handRankings now only contains the best possible handRanking, including finding kickers if needed
+        // handRanking keys are index of $this->players to which the handRanking belongs to
+        // Return the inersection of $this->players which have a key belonging to keys in handRankings
+        // This will return multiple Players is there is a chopped pot
+
+        // In the above example, Player 0 and Player 3 have the same exact hand KQJT9
+        // handRanking keys will be [0, 3]
+        // Return the $this->players which have the keys 0 and 3, these are the winners
+        return array_intersect_key($this->players, $handRankings);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace simplehacker\PHPoker\Tests;
 
+use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Player;
 use simplehacker\PHPoker\Games\NoLimitHoldem;
 use simplehacker\PHPoker\Tests\PHPokerTestCase;
@@ -216,4 +217,49 @@ class NoLimitHoldemTest extends PHPokerTestCase
         $hand->river();
         $hand->river();
     }
+
+    /** @test */
+    public function can_set_community_cards_and_players_hole_cards_for_testing_only()
+    {
+        $communityCards = ['Ah', '3s', 'Kd', '9d', 'Qs']; 
+        $playersWithHoleCards = [['5s', '5d'], ['9c', 'Tc']];
+
+        // TestCase helper method for setting communityCards and player's hole cards
+        // using RelectionClass to set protected properties
+        // Used for testing hand winners are correct, because otherwise it would be random every test
+        $hand = $this->createNoLimitHoldemHand($communityCards, $playersWithHoleCards);
+
+        $mappedCommunityCards = array_map(fn($card) => new Card($card), $communityCards);
+        $mappedPlayers = array_map(function($cards) {
+            $player = new Player();
+            $holeCards = array_map(fn($card) => new Card($card), $cards);
+            $player->giveCards($holeCards);
+            return $player;
+        }, $playersWithHoleCards);
+
+        $this->assertEquals($mappedCommunityCards, $hand->getCommunityCards());
+        $this->assertEquals($mappedPlayers, $hand->getPlayers());
+    }
+
+    /** @test */
+    public function can_get_correct_winners_of_the_hand()
+    {
+        $communityCards = ['Ah', '3s', 'Kd', '9d', 'Qs']; 
+        $playersWithHoleCards = [['4s', '5c'], ['9s', 'Td'], ['5s', '5d'], ['9c', 'Tc']];
+        $hand = $this->createNoLimitHoldemHand($communityCards, $playersWithHoleCards);
+
+        $winners = $hand->getPlayers();
+        unset($winners[0], $winners[2]);
+
+        // var_dump($hand->getWinners());
+        // die();
+        
+        $this->assertEquals($winners, $hand->getWinners());
+    }
+
+    // /** @test */
+    // public function cannot_get_winner_if_there_is_not_five_commmunity_cards()
+    // {
+        
+    // }
 }

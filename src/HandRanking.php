@@ -143,6 +143,18 @@ class HandRanking
     }
 
     /**
+    * Returns an array of Card values from the best hand
+    * This is used for determining kickers
+    * e.g. [9, 9, 14, 13, 12]
+    *
+    * @return array
+    */
+    public function getKickers(): Array
+    {
+        return array_map(fn($card) => $card->getValueRank(), $this->hand);
+    }
+
+    /**
     * Returns short values description of the best hand found
     * e.g. Kh9c6h4s3d
     *

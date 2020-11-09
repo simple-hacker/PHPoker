@@ -183,9 +183,9 @@ class Card
     /**
     * Returns the card's value
     * 
-    * @return string
+    * @return int
     */
-    public function getValueRank(): String
+    public function getValueRank(): Int
     {
         return $this->value;
     }
