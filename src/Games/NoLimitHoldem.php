@@ -242,28 +242,28 @@ class NoLimitHoldem
             $setKickers = true;
             
             // These are the types of hands that could have kickers
-            // e.g. in the same two pair hand, the kicker would be in the 5th card.
-            // e.g. in the same three of a kind, the kickers start from the 4th card
-            // e.g. in the same high card, the kickers start from the 2nd card
-            // e.g. in the same high card flush, the kickers start from the 2nd card
+            // e.g. in the same two pair hand, the kicker would be in the 5th card = index 4
+            // e.g. in the same three of a kind, the kickers start from the 4th card = index 3
+            // e.g. in the same high card, the kickers start from the 2nd card = index 1
+            // e.g. in the same high card flush, the kickers start from the 2nd card = index 1
             switch($bestHandRank) {
                 case HandRanking::HIGH_CARD_RANK:
-                    $kickerFromValue = 2;
+                    $kickerFromIndex = 1;
                     break;
                 case HandRanking::ONE_PAIR_RANK:
-                    $kickerFromValue = 3;
+                    $kickerFromIndex = 2;
                     break;
                 case HandRanking::TWO_PAIR_RANK:
-                    $kickerFromValue = 5;
+                    $kickerFromIndex = 4;
                     break;
                 case HandRanking::THREE_OF_A_KIND_RANK:
-                    $kickerFromValue = 4;
+                    $kickerFromIndex = 3;
                     break;
                 case HandRanking::FLUSH_RANK:
-                    $kickerFromValue = 2;
+                    $kickerFromIndex = 1;
                     break;
                 case HandRanking::FOUR_OF_A_KIND_RANK:
-                    $kickerFromValue = 5;
+                    $kickerFromIndex = 4;
                     break;
                 default:
                     $setKickers = false;
@@ -279,11 +279,11 @@ class NoLimitHoldem
             // Loop through all five cards of each best hand and filter out according to best value
             // at current index $kickerIndex
             // If at any point there is only one handRanking then we have a solo winner so stop looping
-            for ($kickerIndex = 1; $kickerIndex < 6; $kickerIndex++) {
+            for ($kickerIndex = 0; $kickerIndex < 5; $kickerIndex++) {
 
                 // Get the values of each $kickers at index kickerIndex
                 // e.g. first one will be [13, 12, 13] ([K, Q, K])
-                $currentKickerValues = array_unique(array_column($kickers, $kickerIndex - 1));
+                $currentKickerValues = array_unique(array_column($kickers, $kickerIndex));
                 // Get the max of [13, 12] = 13
                 $bestCurrentKickerValue = max($currentKickerValues);
 
@@ -291,10 +291,10 @@ class NoLimitHoldem
                 // And the kickerIndex is greater than or equal to the index of where kickers could start from
                 // Only set kickers if there are multiple values in $currentKickerValues
                 // to prevent exact same hands having kickers added on.
-                if ($setKickers && ($kickerIndex >= $kickerFromValue) && (count($currentKickerValues) > 1)) {
+                if ($setKickers && ($kickerIndex >= $kickerFromIndex) && (count($currentKickerValues) > 1)) {
                     // Set Kicker
                     foreach($handRankings as $handRanking) {
-                        $kickerCard = $handRanking->getHand()[$kickerIndex - 1];
+                        $kickerCard = $handRanking->getHand()[$kickerIndex];
                         $handRanking->setKicker($kickerCard);
                     }
                     // NOTE:
@@ -306,7 +306,7 @@ class NoLimitHoldem
                 // Filter out handRankings where the card of best hand at index kickerIndex
                 // is not the $bestCurrentKickerValue = 13
                 $handRankings = array_filter($handRankings, function($handRank) use ($kickerIndex, $bestCurrentKickerValue) {
-                    return $handRank->getHand()[$kickerIndex - 1]->getValueRank() === $bestCurrentKickerValue;
+                    return $handRank->getHand()[$kickerIndex]->getValueRank() === $bestCurrentKickerValue;
                 });
 
                 // If there is only one handRanking then we have a solo winner
