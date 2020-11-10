@@ -28,7 +28,16 @@ class HandRanking
      * 
      * @var integer
      */
-    protected $rank = 0;
+    protected $handRank = 0;
+
+    /**
+     * The hand ranking value
+     * Used when comparing hands together
+     * See computeBestHandValue for how this is calculated
+     * 
+     * @var integer
+     */
+    protected $handValue = 0;
 
     /**
      * The hand type rank values
@@ -143,6 +152,7 @@ class HandRanking
         $this->suitHistogram = $this->computeSuitHistogram();
 
         $this->computeBestHand();
+        $this->computeBestHandValue();
     }
 
     /**
@@ -217,9 +227,19 @@ class HandRanking
     *
     * @return integer
     */
-    public function getRank(): Int
+    public function getHandRank(): Int
     {
-        return $this->rank;
+        return $this->handRank;
+    }
+
+    /**
+    * Returns the hand's value
+    *
+    * @return integer
+    */
+    public function getHandValue(): Int
+    {
+        return $this->handValue;
     }
 
     /**
@@ -345,13 +365,13 @@ class HandRanking
         if ($this->isRoyalFlush())
         {
             $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->rank = self::ROYAL_FLUSH_RANK;
+            $this->handRank = self::ROYAL_FLUSH_RANK;
             $this->description = 'Royal Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
         }
         elseif ($this->isStraightFlush())
         {
             $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->rank = self::STRAIGHT_FLUSH_RANK;
+            $this->handRank = self::STRAIGHT_FLUSH_RANK;
             $this->description = 'Straight Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
         }
         elseif ($this->isFourOfAKind())
@@ -362,32 +382,32 @@ class HandRanking
             $highestCard = $this->getHighCard($withoutTopN);
             $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
             $this->hand = $fourOfAKind;
-            $this->rank = self::FOUR_OF_A_KIND_RANK;
+            $this->handRank = self::FOUR_OF_A_KIND_RANK;
             $this->description = 'Four of a Kind, ' . $this->hand[0]->getValue() . 's';
         }
         elseif ($this->isFullHouse())
         {
             $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 2));
-            $this->rank = self::FULL_HOUSE_RANK;
+            $this->handRank = self::FULL_HOUSE_RANK;
             $this->description = 'Full House, ' . $this->hand[0]->getValue() . 's full of ' . $this->hand[3]->getValue() . 's';
         }
         elseif ($this->isFlush())
         {
             $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->rank = self::FLUSH_RANK;
+            $this->handRank = self::FLUSH_RANK;
             $this->description = 'Flush, ' . $this->hand[0]->getValue() . ' high of ' . $this->hand[0]->getSuit();
         }
         elseif ($this->isStraight())
         {
             // Loop through the foundStraight and return the first Card at valueIndex
             $this->hand = array_map(fn($valueIndex) => $this->sortedValues[$valueIndex][0], $this->foundStraight);
-            $this->rank = self::STRAIGHT_RANK;
+            $this->handRank = self::STRAIGHT_RANK;
             $this->description = 'Straight, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue();
         }
         elseif ($this->isThreeOfAKind())
         {
             $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 1), array_slice(next($this->valueHistogram), 0, 1));
-            $this->rank = self::THREE_OF_A_KIND_RANK;
+            $this->handRank = self::THREE_OF_A_KIND_RANK;
             $this->description = 'Three of a Kind, ' . $this->hand[0]->getValue() .'s';
         }
         elseif ($this->isTwoPair())
@@ -398,7 +418,7 @@ class HandRanking
             $highestCard = $this->getHighCard($withoutTopN);
             $twoPair[] = $highestCard; // Append highestCard to twoPair
             $this->hand = $twoPair;
-            $this->rank = self::TWO_PAIR_RANK;
+            $this->handRank = self::TWO_PAIR_RANK;
             $this->description = 'Two Pair, ' . $this->hand[0]->getValue() .'s and ' . $this->hand[2]->getValue() .'s';
         }
         elseif ($this->isOnePair())
@@ -409,7 +429,7 @@ class HandRanking
                                 array_slice(next($this->valueHistogram), 0, 1),
                                 array_slice(next($this->valueHistogram), 0, 1)
                         );
-            $this->rank = self::ONE_PAIR_RANK;
+            $this->handRank = self::ONE_PAIR_RANK;
             $this->description = 'One Pair, ' . $this->hand[0]->getValue() .'s';
         }
         elseif ($this->isHighCard())
@@ -421,7 +441,7 @@ class HandRanking
                                 array_slice(next($this->valueHistogram), 0, 1),
                                 array_slice(next($this->valueHistogram), 0, 1)
                         );
-            $this->rank = self::HIGH_CARD_RANK;
+            $this->handRank = self::HIGH_CARD_RANK;
             $this->description = 'High Card, ' . $this->hand[0]->getValue();
         }
         
@@ -433,6 +453,32 @@ class HandRanking
         foreach($this->hand as $card) {
             $this->shortDescription .= $card->getShortDescription();
         }
+    }
+
+    /**
+    * Compute a numerical value for hand ranking
+    * Used for quicker comparing of hands
+    * 
+    * @return void
+    */
+    public function computeBestHandValue(): void
+    {
+        // The hand is sorted with the most significant cards to the front i.e. [14, 12, 10, 6, 5]
+        // https://stackoverflow.com/a/42396124/7095440
+        // Convert hand to a 24 bit binary
+        // [HAND_RANK Binary] [Card 0 Binary] [Card 1 Binary] [Card 2 Binary] [Card 3 Binary] [Card 4 Binary]
+
+        // Hand rank binary padded to four bits
+        $binary = sprintf("%04d", decbin($this->handRank));
+
+        // Append card value binary padded to four bits, to binary string
+        // The hand has already been normalised to left most significant cards
+        foreach($this->hand as $card) {
+            $binary .= sprintf("%04d", decbin($card->getValueRank()));
+        }
+
+        // Convert 24 bit binary to an integer
+        $this->handValue = bindec($binary);
     }
 
     /**
@@ -625,7 +671,7 @@ class HandRanking
 
     /**
     * Returns if the hand ranking is one pairs
-    * Determined by if the count of the each elemt is exactly one
+    * Determined by if the count of the each element is exactly one
     * 
     * @return bool
     */

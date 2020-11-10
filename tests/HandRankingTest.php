@@ -307,7 +307,7 @@ class HandRankingTest extends PHPokerTestCase
         $this->assertEquals($handRanking->getHand(), $hand);
         $this->assertEquals($handRanking->getShortDescription(), $handShortDescription);
         $this->assertEquals($handRanking->getDescription(), $handDescription);
-        $this->assertEquals($handRanking->getRank(), $handRank);
+        $this->assertEquals($handRanking->getHandRank(), $handRank);
     }
 
     public function bestHands()
