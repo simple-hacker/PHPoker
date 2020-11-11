@@ -40,6 +40,23 @@ class HandRanking
     protected $handValue = 0;
 
     /**
+     * The hand ranking type value
+     * Used when working out if we need to include kickers in a description
+     * See generateBestHandValue for how this is calculated
+     * 
+     * @var integer
+     */
+    protected $handTypeValue = 0;
+
+    /**
+     * If the best hand was determined by kickers then set to true
+     * Used when generating a description to include kicker information
+     * 
+     * @var bool
+     */
+    public $determinedByKickers = false;
+
+    /**
      * The hand type rank values
      */
     const ROYAL_FLUSH_RANK      = 10;
@@ -52,15 +69,6 @@ class HandRanking
     const TWO_PAIR_RANK         = 3;
     const ONE_PAIR_RANK         = 2;
     const HIGH_CARD_RANK        = 1;
-
-    /**
-     * The hand ranking's kicker value if set
-     * When compairing hand rankings, if a kicker plays then this value is set
-     * And is used when generating a description to include the kicker that plays
-     * 
-     * @var Card
-     */
-    protected $kickerCard;
 
     /**
      * The hand ranking short description
@@ -176,18 +184,6 @@ class HandRanking
     }
 
     /**
-    * Returns an array of Card values from the best hand
-    * This is used for determining kickers
-    * e.g. [9, 9, 14, 13, 12]
-    *
-    * @return array
-    */
-    public function getKickers(): Array
-    {
-        return array_map(fn($card) => $card->getValueRank(), $this->hand);
-    }
-
-    /**
     * Returns short values description of the best hand found
     * e.g. Kh9c6h4s3d
     *
@@ -207,19 +203,31 @@ class HandRanking
     */
     public function getDescription(): string
     {
-        return (! $this->kickerCard) ? $this->description : $this->description . ", with " . $this->kickerCard->getValue() . " kicker";
+        return ($this->determinedByKickers) ? $this->description . $this->getKickerDescription() : $this->description;
+        // return (! $this->kickerCard) ? $this->description : $this->description . ", with " . $this->kickerCard->getValue() . " kicker";
     }
 
+
     /**
-    * If the hand ranking has a kicker when compared to another hand
-    * Set this to the value rank of this kicker
+    * If the hand was determined by kickers when comparing hands
+    * Generate the kickers description
     *
-    * @param Card $kickerCard
-    * @return void
+    * @return string
     */
-    public function setKicker(Card $kickerCard): void
+    public function getKickerDescription(): string
     {
-        $this->kickerCard = $kickerCard;
+        $numberOfSignificantCards = $this->numberOfSignificantCards();
+
+        // Remove the most significant cards of the hand (by offsetting array_slice), leaving only the kickers
+        $kickers = array_slice($this->hand, $numberOfSignificantCards);
+        
+        // Map over and return the card value description from each card
+        $kickers = array_map(fn($kicker) => $kicker->getValue(), $kickers);
+        $kickerDescriptionEnd = (count($kickers) > 1) ? ' kickers' : ' kicker';
+        
+        // If we have kickers then glue kickers together and generate description
+        // Else return empty string        
+        return ($kickers) ? ", with " . implode("+", $kickers). $kickerDescriptionEnd : '';
     }
 
     /**
@@ -240,6 +248,16 @@ class HandRanking
     public function getHandValue(): Int
     {
         return $this->handValue;
+    }
+
+    /**
+    * Returns the hand type's value
+    *
+    * @return integer
+    */
+    public function getHandTypeValue(): Int
+    {
+        return $this->handTypeValue;
     }
 
     /**
@@ -468,17 +486,32 @@ class HandRanking
         // Convert hand to a 24 bit binary
         // [HAND_RANK Binary] [Card 0 Binary] [Card 1 Binary] [Card 2 Binary] [Card 3 Binary] [Card 4 Binary]
 
+        // For certain hand types, only the first n cards are significant
+        // Used when winning hands of the same type were eventually determined by their kicker
+        // so that an appropriate description can be generated
+        // e.g. AAKK8 vs AAKK4
+        // They both have the same significant card value (AAKK)
+        // Take away one to match card indexes
+        $numberOfSignificantCards = $this->numberOfSignificantCards() - 1;
+
         // Hand rank binary padded to four bits
-        $binary = sprintf("%04d", decbin($this->handRank));
+        $handValueBinary = $handTypeValueBinary = sprintf("%04d", decbin($this->handRank));
 
         // Append card value binary padded to four bits, to binary string
         // The hand has already been normalised to left most significant cards
-        foreach($this->hand as $card) {
-            $binary .= sprintf("%04d", decbin($card->getValueRank()));
+        foreach($this->hand as $index => $card) {
+            // Add card binary to actual hand value
+            $handValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
+
+            // Only add card binary if it's a significant card
+            if ($index <= $numberOfSignificantCards) {
+                $handTypeValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
+            }
         }
 
         // Convert 24 bit binary to an integer
-        $this->handValue = bindec($binary);
+        $this->handValue = bindec($handValueBinary);
+        $this->handTypeValue = bindec($handTypeValueBinary);
     }
 
     /**
@@ -511,6 +544,36 @@ class HandRanking
 
         // Return the first card of the maximum value rank.
         return $this->valueHistogram[$highestValue][0];
+    }
+
+    /**
+    * Returns the number of significant cards in a certain hand type
+    * e.g. With three of a kind, the first three cards
+    * e.g. With two pair, the first four cards
+    * e.g. With a straight, all cards
+    * 
+    * @return int
+    */
+    private function numberOfSignificantCards(): Int
+    {
+        // These are the types of hands that could have kickers
+        switch($this->handRank) {
+            case HandRanking::HIGH_CARD_RANK:
+                return 1;
+            case HandRanking::ONE_PAIR_RANK:
+                return 2;
+            case HandRanking::TWO_PAIR_RANK:
+                return 4;
+            case HandRanking::THREE_OF_A_KIND_RANK:
+                return 3;
+            case HandRanking::FLUSH_RANK:
+                return 1;
+            case HandRanking::FOUR_OF_A_KIND_RANK:
+                return 4;
+            default:
+                // Straights, Full Houses and Straight Flushes, all cards are significant
+                return 5;
+        }
     }
 
     /**

@@ -198,6 +198,10 @@ class NoLimitHoldem
     */
     public function getWinners(): Array
     {
+        // NOTE:  ^^^ This will eventually accept and array of players, so when dealing with pots
+        // Will loop through each pot and send an array of players entitled to each pot to determine who wins it.
+        // This will also still calculate whether we need kicker descriptions for each pot still
+
         // Cannot get winners if the river has not been dealt
         // TODO: Also check that all betting ceases (when working with pots)
         if (count($this->communityCards) !== 5) {
@@ -206,37 +210,65 @@ class NoLimitHoldem
 
         $handRankings = [];
         $bestHandValue = 0;
+        $bestHandTypeValue = 0;
+        $numberOfHandsDeterminedByKickers = 0;
 
         // Loop through all players and combine communityCard with player's holeCards (allCards)
         // Get the best hand for each player using allCards
         // Get the hand ranking value of each handRank, setting the best hand rank value along the way
         foreach ($this->players as $playerIndex => $player) {
-            $allCards = [...$this->communityCards, ...$player->getHoleCards()];
-            $handRank = new HandRanking($allCards);            
-            if ($handRank->getHandValue() > $bestHandValue) {
-                $bestHandValue = $handRank->getHandValue();
-                // TODO: $bestSignificantCardsValue = $handRank->getSignificantCardsValue();
+
+            // NOTE: When dealing with pots, check to see if player has already built up their hand ranking to save calculating again
+            // if ($player->getHandRanking()) {
+            //      $handRanking = $player->getHandRanking();
+            // } else {
+            //
+                $allCards = [...$this->communityCards, ...$player->getHoleCards()];
+                $handRanking = new HandRanking($allCards);
+                $player->setHandRanking($handRanking);
+            // }
+            
+            // Set the handRanking to have the same index of the player in $this->players
+            $handRankings[$playerIndex] = $handRanking;
+
+            // If current handRanking is the best hand, then set values to compare against future handRankings
+            if ($handRanking->getHandValue() > $bestHandValue) {
+                // The numerical value for the whole hand.
+                // Used to determine actual best hand including kickers.
+                $bestHandValue = $handRanking->getHandValue();
+                // Hand type value are the significant cards when determining a hand (without kickers)
+                // i.e. in a three of a kind, it's the numerical value for the hand type and the first three cards
+                // i.e. in a two pair, it's the numerical value for the hand type and the first four cards
+                // Used when a kicker plays between the same type of hand (AAKK7 vs AAKK8)
+                // This is NOT used to determine the actual best hand, but to determine if we should include kickers
+                // in the hand description or not.
+                $bestHandTypeValue = $handRanking->getHandTypeValue();
             }
-            // Set the handRank to have the same index of the player in $this->players
-            $handRankings[$playerIndex] = $handRank;
-            $player->setHandRanking($handRank);
         }
 
         // Filter all handRankings where the getHandValue is not the best hand value
-        $handRankings = array_filter($handRankings, function($handRank) use ($bestHandValue) {
-            // NOTE:
-            // If handRanking->significantCardsValue === bestSignificantCardValue
-                // Set kickers or $handRanking->determinedByKickers = true
-                // numberOfHandRankingsDeterminedByKickers++
+        $handRankings = array_filter($handRankings, function($handRanking) use ($bestHandValue, $bestHandTypeValue, $numberOfHandsDeterminedByKickers) {
+            
+            // Example, given three of the same two pairs [AAKKJ, AAKKJ, AAKK8]
+            // they all have the same two pair value AAKK, but only the first two are the actual best hand
+            // as the Jack kickers are better than the 8 kicker
+            // Hand was determined by kicker value as all hands are the same two pair value
+            // Set determinedByKickers and add to the number of hands determinedByKickers
+            if ($handRanking->getHandTypeValue() === $bestHandTypeValue) {
+                $handRanking->determinedByKickers = true;
+                $numberOfHandsDeterminedByKickers++;
+            }
 
-            // Will still only return the actual best hand                
-            return $handRank->getHandValue() === $bestHandValue;
-
-            // So if handRanking is the same three of a kind QQQxx or the same two pair 8866x
-            // Then the bestHand ranking was determined by kickers
-            // Set determinedByKickers property so that when we get description it will add kickers on as well
+            // Only return the actual best hands e.g. AAKKJ
+            return $handRanking->getHandValue() === $bestHandValue;
         });
 
+        // TODO:
+        // TODO:
+        // TODO:
+        // TODO:
+        // TODO:
+        // TODO:
         // TODO:
         // Remove kicker information is hand was not determined by kickers in the end
         // Used when it's a chop between people with the same hand

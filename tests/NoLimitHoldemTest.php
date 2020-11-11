@@ -302,28 +302,27 @@ class NoLimitHoldemTest extends PHPokerTestCase
     {
         // TODO:  Refactor kickers
         
-        // // This is needed so we can access the players best hand description etc
-        // $hand = $this->createNoLimitHoldemHand($communityCards, $players);
+        // This is needed so we can access the players best hand description etc
+        $hand = $this->createNoLimitHoldemHand($communityCards, $players);
 
-        // $winners = $hand->getWinners();
-        // $winner = reset($winners); // Just give the first winner when testing
+        $winners = $hand->getWinners();
+        $winner = reset($winners); // Just give the first winner when testing
 
-        // $handRanking = $winner->getHandRanking();
+        $handRanking = $winner->getHandRanking();
 
-        // $this->assertSame($description, $handRanking->getDescription());
-        // $this->assertSame($shortDescription, $handRanking->getShortDescription());
+        $this->assertSame($description, $handRanking->getDescription());
+        $this->assertSame($shortDescription, $handRanking->getShortDescription());
     }
 
     public function winnerDescriptions()
     {
         return [
-            [['Ah', '9s', '9h', '9c', 'Kh'], [['9d', 'Qd'], ['4h', '4c'], ['Qh', 'Th']], 'Four of a Kind, Nines', '9s9h9d9cAh'],
-            [['Ah', '9s', '9h', '9c', 'Kh'], [['4h', '5h'], ['Qh', 'Th']], 'Flush, Ace high of Hearts, with Queen kicker', 'AhKhQhTh9h'],
+            [['Ah', '9s', '9h', '9c', 'Kh'], [['4h', '5h'], ['Qh', 'Th']], 'Flush, Ace high of Hearts, with King+Queen+Ten+Nine kickers', 'AhKhQhTh9h'],
             [['6h', '5s', '3d', '2c', 'Ah'], [['4h', '7h'], ['Ad', '4c']], 'Straight, Seven to Three', '7h6h5s4h3d'],
-            [['8h', '8s', '8d', '2c', '3h'], [['Ah', 'Kh'], ['Ad', 'Qc']], 'Three of a Kind, Eights, with King kicker', '8s8h8dAhKh'],
+            [['8h', '8s', '8d', '2c', '3h'], [['Ah', 'Kh'], ['Ad', 'Qc']], 'Three of a Kind, Eights, with Ace+King kickers', '8s8h8dAhKh'],
             [['Kh', 'Ks', 'Kd', 'Ac', 'Qh'], [['9d', '9c'], ['Th', 'Tc']], 'Full House, Kings full of Tens', 'KsKhKdThTc'],
-            [['Qh', 'Tc', '8d', '4s', '3c'], [['2d', '9d'], ['9h', '6s'], ['7h', '2h']], 'High Card, Queen, with Six kicker', 'QhTc9h8d6s'],
-            [['Qh', '6c', '5d', '4s', '3c'], [['Td', '9d'], ['9h', '8s']], 'High Card, Queen, with Ten kicker', 'QhTd9d6c5d'],
+            [['Qh', 'Tc', '8d', '4s', '3c'], [['2d', '9d'], ['9h', '6s'], ['7h', '2h']], 'High Card, Queen, with Ten+Nine+Eight+Six kickers', 'QhTc9h8d6s'],
+            [['Qh', '6c', '5d', '4s', '3c'], [['Td', '9d'], ['9h', '8s']], 'High Card, Queen, with Ten+Nine+Six+Five kickers', 'QhTd9d6c5d'],
         ];
     }
 }
