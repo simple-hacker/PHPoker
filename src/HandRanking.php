@@ -33,7 +33,7 @@ class HandRanking
     /**
      * The hand ranking value
      * Used when comparing hands together
-     * See computeBestHandValue for how this is calculated
+     * See generateBestHandValue for how this is calculated
      * 
      * @var integer
      */
@@ -147,12 +147,12 @@ class HandRanking
             throw new InvalidHandRankingException('Need between 5 and 8 cards to determine hand ranking');
         }
 
-        $this->valueHistogram = $this->computeValueHistogram();
-        $this->sortedValues = $this->computeSortedValues();
-        $this->suitHistogram = $this->computeSuitHistogram();
+        $this->valueHistogram = $this->generateValueHistogram();
+        $this->sortedValues = $this->sortValueHistogramAccordingToValue();
+        $this->suitHistogram = $this->generateSuitHistogram();
 
-        $this->computeBestHand();
-        $this->computeBestHandValue();
+        $this->generateBestHand();
+        $this->generateBestHandValue();
     }
 
     /**
@@ -267,7 +267,7 @@ class HandRanking
     * 
     * @return array
     */
-    private function computeValueHistogram(): Array
+    private function generateValueHistogram(): Array
     {
         $values = [];
 
@@ -304,7 +304,7 @@ class HandRanking
     * 
     * @return array
     */
-    private function computeSortedValues(): Array
+    private function sortValueHistogramAccordingToValue(): Array
     {
         $sortedHistogram = $this->valueHistogram;
 
@@ -328,7 +328,7 @@ class HandRanking
     * 
     * @return array
     */
-    private function computeSuitHistogram(): Array
+    private function generateSuitHistogram(): Array
     {
         $suits = [];
 
@@ -360,7 +360,7 @@ class HandRanking
     * 
     * @return void
     */
-    private function computeBestHand()
+    private function generateBestHand()
     {
         if ($this->isRoyalFlush())
         {
@@ -456,12 +456,12 @@ class HandRanking
     }
 
     /**
-    * Compute a numerical value for hand ranking
+    * generate a numerical value for hand ranking
     * Used for quicker comparing of hands
     * 
     * @return void
     */
-    public function computeBestHandValue(): void
+    public function generateBestHandValue(): void
     {
         // The hand is sorted with the most significant cards to the front i.e. [14, 12, 10, 6, 5]
         // https://stackoverflow.com/a/42396124/7095440

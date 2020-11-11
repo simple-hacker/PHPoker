@@ -215,6 +215,7 @@ class NoLimitHoldem
             $handRank = new HandRanking($allCards);            
             if ($handRank->getHandValue() > $bestHandValue) {
                 $bestHandValue = $handRank->getHandValue();
+                // TODO: $bestSignificantCardsValue = $handRank->getSignificantCardsValue();
             }
             // Set the handRank to have the same index of the player in $this->players
             $handRankings[$playerIndex] = $handRank;
@@ -223,8 +224,37 @@ class NoLimitHoldem
 
         // Filter all handRankings where the getHandValue is not the best hand value
         $handRankings = array_filter($handRankings, function($handRank) use ($bestHandValue) {
+            // NOTE:
+            // If handRanking->significantCardsValue === bestSignificantCardValue
+                // Set kickers or $handRanking->determinedByKickers = true
+                // numberOfHandRankingsDeterminedByKickers++
+
+            // Will still only return the actual best hand                
             return $handRank->getHandValue() === $bestHandValue;
+
+            // So if handRanking is the same three of a kind QQQxx or the same two pair 8866x
+            // Then the bestHand ranking was determined by kickers
+            // Set determinedByKickers property so that when we get description it will add kickers on as well
         });
+
+        // TODO:
+        // Remove kicker information is hand was not determined by kickers in the end
+        // Used when it's a chop between people with the same hand
+        // Given three different three of a kinds, numberOfHandRankingsDeterminedByKickers = 3
+        // [A, A, A, K, Q], [A, A, A, K, J], [A, A, A, K, Q]
+        // Actual best hands count(handRankings) == 2, but three hands were determinedByKickers
+        // So need to keep kicker information
+        // If count(handRankings) == determinedByKickers then hand wasn't determined by kickers so 
+        // remove kicker information
+        // if count($handRankings) == $numberOfHandRankingsDeterminedByKickers
+            // Loop through and setKickers to false
+        
+        // Return the $this->players which have the same keys as the winning handRankings
+        // This will return multiple Players if there is a chopped pot
+        return array_intersect_key($this->players, $handRankings);
+
+
+
 
         // // If the count of handRankings is greater than one, then there are at least two players with the same type of hand
         // // e.g. three straights
@@ -308,15 +338,5 @@ class NoLimitHoldem
         //         }
         //     }
         // }
-
-        // handRankings now only contains the best possible handRanking, including finding kickers if needed
-        // handRanking keys are index of $this->players to which the handRanking belongs to
-        // Return the intersection of $this->players which have a key belonging to keys in handRankings
-        // This will return multiple Players if there is a chopped pot
-
-        // In the above example, Player 0 and Player 3 have the same exact hand KQJT9
-        // handRanking keys will be [0, 3]
-        // Return the $this->players which have the keys 0 and 3, these are the winners
-        return array_intersect_key($this->players, $handRankings);
     }
 }
