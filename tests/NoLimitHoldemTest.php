@@ -299,9 +299,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
      * @dataProvider winnerDescriptions
      * */
     public function the_players_best_hand_is_saved_to_players_during_showdown($communityCards, $players, $description, $shortDescription)
-    {
-        // TODO:  Refactor kickers
-        
+    {       
         // This is needed so we can access the players best hand description etc
         $hand = $this->createNoLimitHoldemHand($communityCards, $players);
 
@@ -323,6 +321,91 @@ class NoLimitHoldemTest extends PHPokerTestCase
             [['Kh', 'Ks', 'Kd', 'Ac', 'Qh'], [['9d', '9c'], ['Th', 'Tc']], 'Full House, Kings full of Tens', 'KsKhKdThTc'],
             [['Qh', 'Tc', '8d', '4s', '3c'], [['2d', '9d'], ['9h', '6s'], ['7h', '2h']], 'High Card, Queen, with Ten+Nine+Eight+Six kickers', 'QhTc9h8d6s'],
             [['Qh', '6c', '5d', '4s', '3c'], [['Td', '9d'], ['9h', '8s']], 'High Card, Queen, with Ten+Nine+Six+Five kickers', 'QhTd9d6c5d'],
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider kickerDescriptions
+     * */
+    public function kicker_descriptions_for_all_players_when_needed($communityCards, $players, $descriptions)
+    {
+        $hand = $this->createNoLimitHoldemHand($communityCards, $players);
+        // Generate handRankings and descriptions for all players still left in the pot
+        $hand->showdown();
+        $players = $hand->getPlayers();
+
+        $handDescriptions = array_map(fn($player) => $player->getHandRanking()->getDescription(), $players);
+
+        $this->assertSame($descriptions, $handDescriptions);
+    }
+
+    public function kickerDescriptions()
+    {
+        return [
+            [
+                ['Ah', '9s', '9h', '9c', 'Kh'],
+                [['4h', '5h'], ['Qh', 'Th']],
+                [
+                    0 => 'Flush, Ace high of Hearts, with King+Nine+Five+Four kickers',
+                    1 => 'Flush, Ace high of Hearts, with King+Queen+Ten+Nine kickers',
+                ]
+            ],
+            [
+                ['Ah', 'As', '9h', '8c', 'Qs'],
+                [['Kh', 'Kd'], ['Qc', '9c'], ['Kc', 'Ks']],
+                [
+                    // No kickers needed and both AAKK had the same kicker Queen
+                    0 => 'Two Pair, Aces and Kings',
+                    1 => 'Two Pair, Aces and Queens',
+                    2 => 'Two Pair, Aces and Kings',
+                ]
+            ],
+            [
+                ['Ah', 'As', '9h', '8c', 'Qs'],
+                [['Qh', 'Kd'], ['Qc', '9c'], ['Qd', 'Ks']],
+                [
+                    // All three players have Aces and Queens
+                    // But Players 0 and 2 have the best hand with the King kicker
+                    // Set kickerDescriptions for all hands
+                    0 => 'Two Pair, Aces and Queens, with King kicker',
+                    1 => 'Two Pair, Aces and Queens, with Nine kicker',
+                    2 => 'Two Pair, Aces and Queens, with King kicker',
+                ]
+            ],
+            [
+                ['Ah', 'As', 'Ad', 'Ac', 'Ts'],
+                [['4h', '4d'], ['6c', '6s'], ['8d', '8s']],
+                [
+                    // Three way chop with AAAAT, don't include kickers
+                    0 => 'Four of a Kind, Aces',
+                    1 => 'Four of a Kind, Aces',
+                    2 => 'Four of a Kind, Aces',
+                ]
+            ],
+            [
+                ['Ah', 'As', 'Ad', 'Ac', 'Ts'],
+                [['4h', '4d'], ['6c', '6s'], ['8d', 'Ks']],
+                [
+                    // AAAAK > AAAAT so include kickers
+                    0 => 'Four of a Kind, Aces, with Ten kicker',
+                    1 => 'Four of a Kind, Aces, with Ten kicker',
+                    2 => 'Four of a Kind, Aces, with King kicker',
+                ]
+            ],
+            [
+                ['6h', '6s', 'Kd', '2c', '2s'],
+                [['Kc', '4s'], ['Ah', 'Ad'], ['Kh', 'Qs']],
+                [
+                    // All have two pairs, 0 and 2 both have KK66 where kicker plays
+                    // Player 0 has KK664
+                    // Player 1 has AA66K
+                    // Player 2 has KK66Q
+                    0 => 'Two Pair, Kings and Sixs, with Four kicker',
+                    1 => 'Two Pair, Aces and Sixs',
+                    2 => 'Two Pair, Kings and Sixs, with Queen kicker',
+                ]
+            ],
         ];
     }
 }

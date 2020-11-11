@@ -33,7 +33,7 @@ class HandRanking
     /**
      * The hand ranking value
      * Used when comparing hands together
-     * See generateBestHandValue for how this is calculated
+     * See computeHandValues for how this is calculated
      * 
      * @var integer
      */
@@ -42,14 +42,14 @@ class HandRanking
     /**
      * The hand ranking type value
      * Used when working out if we need to include kickers in a description
-     * See generateBestHandValue for how this is calculated
+     * See computeHandValues for how this is calculated
      * 
      * @var integer
      */
     protected $handTypeValue = 0;
 
     /**
-     * If the best hand was determined by kickers then set to true
+     * If the hand was determined by kickers, when comparing to another hand, then set to true
      * Used when generating a description to include kicker information
      * 
      * @var bool
@@ -160,7 +160,7 @@ class HandRanking
         $this->suitHistogram = $this->generateSuitHistogram();
 
         $this->generateBestHand();
-        $this->generateBestHandValue();
+        $this->computeHandValues();
     }
 
     /**
@@ -204,7 +204,6 @@ class HandRanking
     public function getDescription(): string
     {
         return ($this->determinedByKickers) ? $this->description . $this->getKickerDescription() : $this->description;
-        // return (! $this->kickerCard) ? $this->description : $this->description . ", with " . $this->kickerCard->getValue() . " kicker";
     }
 
 
@@ -479,7 +478,7 @@ class HandRanking
     * 
     * @return void
     */
-    public function generateBestHandValue(): void
+    public function computeHandValues(): void
     {
         // The hand is sorted with the most significant cards to the front i.e. [14, 12, 10, 6, 5]
         // https://stackoverflow.com/a/42396124/7095440
