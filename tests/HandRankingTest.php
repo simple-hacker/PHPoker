@@ -3,7 +3,7 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
-use simplehacker\PHPoker\HandRanking;
+use simplehacker\PHPoker\Hand;
 use simplehacker\PHPoker\Tests\PHPokerTestCase;
 use simplehacker\PHPoker\Exceptions\InvalidHandRankingException;
 
@@ -13,7 +13,7 @@ class HandRankingTest extends PHPokerTestCase
     public function an_array_of_cards_can_be_given_when_instantiating()
     {
         $cards = [new Card('Ac'), '2d', new Card('3s'), new Card('4d'), new Card('5s')];
-        $hand = new HandRanking($cards);
+        $hand = new Hand($cards);
 
         $this->assertCount(5, $hand->getCards());
     }
@@ -22,7 +22,7 @@ class HandRankingTest extends PHPokerTestCase
     public function a_string_of_cards_can_be_given_when_instantiating()
     {
         $cards = 'Ac2h3s4d5s';
-        $hand = new HandRanking($cards);
+        $hand = new Hand($cards);
 
         $this->assertCount(5, $hand->getCards());
     }
@@ -34,7 +34,7 @@ class HandRankingTest extends PHPokerTestCase
 
         // Only four cards provided
         $cards = 'Ac2h3s4d';
-        $hand = new HandRanking($cards);
+        $hand = new Hand($cards);
     }
 
     /** @test */
@@ -43,7 +43,7 @@ class HandRankingTest extends PHPokerTestCase
         $this->expectException(InvalidHandRankingException::class);
         
         $cards = 'Ac2h3s4d3s';
-        $hand = new HandRanking($cards);
+        $hand = new Hand($cards);
     }
 
     /** @test */
@@ -56,7 +56,7 @@ class HandRankingTest extends PHPokerTestCase
         $FourD = new Card('4d');
         $FiveS = new Card('5s');
 
-        $hand = new HandRanking([$FourD, $FiveS, $ThreeH, $AceH, $TwoH]);
+        $hand = new Hand([$FourD, $FiveS, $ThreeH, $AceH, $TwoH]);
 
         $expected = [
             3 => [$AceH, $ThreeH, $TwoH],
@@ -79,7 +79,7 @@ class HandRankingTest extends PHPokerTestCase
         $FiveD = new Card('5d');
         $KingS = new Card('Ks');
 
-        $hand = new HandRanking([$KingS, $FiveD, $JackC, $JackS, $KingC, $JackH]);
+        $hand = new Hand([$KingS, $FiveD, $JackC, $JackS, $KingC, $JackH]);
 
         $expected = [
             11 => [$JackS, $JackH, $JackC],
@@ -96,7 +96,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_a_royal_flush($hand, $isRoyalFlush)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isRoyalFlush(), $isRoyalFlush);
     }
@@ -116,7 +116,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_a_straight_flush($hand, $isStraightFlush)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isStraightFlush(), $isStraightFlush);
     }
@@ -136,7 +136,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_a_four_of_a_kind($hand, $isFourOfAKind)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isFourOfAKind(), $isFourOfAKind);
     }
@@ -156,7 +156,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_a_full_house($hand, $isFullHouse)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isFullHouse(), $isFullHouse);
     }
@@ -177,7 +177,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_a_flush($hand, $isFlush)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isFlush(), $isFlush);
     }
@@ -197,7 +197,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_a_straight($hand, $isStraight)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isStraight(), $isStraight);
     }
@@ -220,7 +220,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_a_three_of_a_kind($hand, $isThreeOfAKind)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isThreeOfAKind(), $isThreeOfAKind);
     }
@@ -241,7 +241,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_two_pair($hand, $isTwoPair)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isTwoPair(), $isTwoPair);
     }
@@ -262,7 +262,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_one_pair($hand, $isOnePair)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isOnePair(), $isOnePair);
     }
@@ -283,7 +283,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_is_high_card($hand, $isHighCard)
     {
-        $hand = new HandRanking($hand);
+        $hand = new Hand($hand);
 
         $this->assertEquals($hand->isHighCard(), $isHighCard);
     }
@@ -303,7 +303,7 @@ class HandRankingTest extends PHPokerTestCase
     */
     public function hand_ranking_gives_best_five_cards($cards, $hand, $handShortDescription, $handDescription, $handRank)
     {
-        $handRanking = new HandRanking($cards);
+        $handRanking = new Hand($cards);
         $this->assertEquals($handRanking->getHand(), $hand);
         $this->assertEquals($handRanking->getShortDescription(), $handShortDescription);
         $this->assertEquals($handRanking->getDescription(), $handDescription);

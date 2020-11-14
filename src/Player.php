@@ -2,6 +2,7 @@
 
 namespace simplehacker\PHPoker;
 
+use simplehacker\PHPoker\Hand;
 use simplehacker\PHPoker\Exceptions\InvalidPlayerOperationException;
 
 class Player
@@ -18,7 +19,7 @@ class Player
      * 
      * @var HandRanking
      */
-    protected $handRanking;
+    protected $hand;
 
     /**
     * Assign an array of Card's to the player's hole cards
@@ -72,26 +73,26 @@ class Player
     }
 
     /**
-    * Sets the player's HandRanking class object
+    * Sets the player's Hand class object
     * 
     * @return void
     */
-    public function setHandRanking(HandRanking $handRanking): void
+    public function setHand(Hand $hand): void
     {
-        $this->handRanking = $handRanking;
+        $this->hand = $hand;
     }
 
     /**
-    * Returns the player's HandRanking class object
+    * Returns the player's Hand class object
     * 
-    * @return HandRanking
+    * @return Hand
     */
-    public function getHandRanking(): HandRanking
+    public function getHand(): Hand
     {
-        if (! $this->handRanking) {
+        if (! $this->hand) {
             throw new InvalidPlayerOperationException('Hand ranking has not been generated yet');
         }
 
-        return $this->handRanking;
+        return $this->hand;
     }
 }

@@ -3,10 +3,10 @@
 namespace simplehacker\PHPoker\Games;
 
 use simplehacker\PHPoker\Deck;
+use simplehacker\PHPoker\Hand;
 use simplehacker\PHPoker\Player;
 use simplehacker\PHPoker\Exceptions\HandException;
 use simplehacker\PHPoker\Exceptions\InvalidActionException;
-use simplehacker\PHPoker\HandRanking;
 
 class NoLimitHoldem
 {
@@ -223,7 +223,7 @@ class NoLimitHoldem
             throw new InvalidActionException('Cannot get winners until there are five community cards');
         }
 
-        $handRankings = [];
+        $hands = [];
         $bestHandValue = 0;
         $bestHandTypeValue = 0;
 
@@ -234,12 +234,12 @@ class NoLimitHoldem
 
             // NOTE: When dealing with pots, check to see if player has already built up their hand ranking to save calculating again
             // if ($player->getHandRanking()) {
-            //      $handRanking = $player->getHandRanking();
+            //      $hand = $player->getHandRanking();
             // } else {
             //
                 $allCards = [...$this->communityCards, ...$player->getHoleCards()];
-                $handRanking = new HandRanking($allCards);
-                $player->setHandRanking($handRanking);
+                $hand = new Hand($allCards);
+                $player->setHand($hand);
             // }
             
             // Group the handRankings together first by the same handTypeValue and then by actual handValue
@@ -256,9 +256,9 @@ class NoLimitHoldem
             //      ]
             // ]
             // Set the handRanking to have the same index of the player in $this->players
-            $handTypeValue = $handRanking->getHandTypeValue();
-            $handValue = $handRanking->getHandValue();
-            $handRankings[$handTypeValue][$handValue][$playerIndex] = $handRanking;
+            $handTypeValue = $hand->getHandTypeValue();
+            $handValue = $hand->getHandValue();
+            $hands[$handTypeValue][$handValue][$playerIndex] = $hand;
 
             // If current handRanking is the best hand, then set values to compare against future handRankings
             if ($handValue > $bestHandValue) {
@@ -279,11 +279,11 @@ class NoLimitHoldem
         // If the count of handType array is greater than one then that particular hand ranking was determined by it's kickers,
         // so set determinedByKickers to true.
         // In the above example, AAKK was determined by kickers 8 and 7 (but not AA88)
-        foreach ($handRankings as $handTypes) {
+        foreach ($hands as $handTypes) {
             if (count($handTypes) > 1) {
                 foreach ($handTypes as $hand) {
-                    foreach ($hand as $handRanking) {
-                        $handRanking->determinedByKickers = true;
+                    foreach ($hand as $hand) {
+                        $hand->determinedByKickers = true;
                     }
                 }
             }
@@ -293,6 +293,6 @@ class NoLimitHoldem
         // We know the bestHandTypeValue and bestHandValue so we can just return the Players than have been
         // put in to the actual best hand bucket
         // Return the Player objects where the keys intersect with the keys of the winning bucket.
-        return array_intersect_key($this->players, $handRankings[$bestHandTypeValue][$bestHandValue]);
+        return array_intersect_key($this->players, $hands[$bestHandTypeValue][$bestHandValue]);
     }
 }

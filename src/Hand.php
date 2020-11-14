@@ -5,7 +5,7 @@ namespace simplehacker\PHPoker;
 use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Exceptions\InvalidHandRankingException;
 
-class HandRanking
+class Hand
 {     
     /**
      * The cards given for the hand ranking
@@ -557,17 +557,17 @@ class HandRanking
     {
         // These are the types of hands that could have kickers
         switch($this->handRank) {
-            case HandRanking::HIGH_CARD_RANK:
+            case Hand::HIGH_CARD_RANK:
                 return 1;
-            case HandRanking::ONE_PAIR_RANK:
+            case Hand::ONE_PAIR_RANK:
                 return 2;
-            case HandRanking::TWO_PAIR_RANK:
+            case Hand::TWO_PAIR_RANK:
                 return 4;
-            case HandRanking::THREE_OF_A_KIND_RANK:
+            case Hand::THREE_OF_A_KIND_RANK:
                 return 3;
-            case HandRanking::FLUSH_RANK:
+            case Hand::FLUSH_RANK:
                 return 1;
-            case HandRanking::FOUR_OF_A_KIND_RANK:
+            case Hand::FOUR_OF_A_KIND_RANK:
                 return 4;
             default:
                 // Straights, Full Houses and Straight Flushes, all cards are significant

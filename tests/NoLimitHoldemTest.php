@@ -306,7 +306,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
         $winners = $hand->getWinners();
         $winner = reset($winners); // Just give the first winner when testing
 
-        $handRanking = $winner->getHandRanking();
+        $handRanking = $winner->getHand();
 
         $this->assertSame($description, $handRanking->getDescription());
         $this->assertSame($shortDescription, $handRanking->getShortDescription());
@@ -335,7 +335,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
         $hand->showdown();
         $players = $hand->getPlayers();
 
-        $handDescriptions = array_map(fn($player) => $player->getHandRanking()->getDescription(), $players);
+        $handDescriptions = array_map(fn($player) => $player->getHand()->getDescription(), $players);
 
         $this->assertSame($descriptions, $handDescriptions);
     }
