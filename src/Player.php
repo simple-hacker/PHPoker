@@ -15,9 +15,9 @@ class Player
     protected $holeCards = [];
 
     /**
-     * The player's HandRanking class object
+     * The player's Hand class object
      * 
-     * @var HandRanking
+     * @var Hand
      */
     protected $hand;
 
