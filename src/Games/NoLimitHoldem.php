@@ -226,7 +226,7 @@ class NoLimitHoldem
 
         $hands = [];
         $bestHandValue = 0;
-        $bestHandTypeValue = 0;
+        $besthandValueWithoutKickers = 0;
 
         // Loop through all players and combine communityCard with player's holeCards (allCards)
         // Get the best hand for each player using allCards
@@ -243,7 +243,7 @@ class NoLimitHoldem
                 $player->setHand($hand);
             // }
             
-            // Group the handRankings together first by the same handTypeValue and then by actual handValue
+            // Group the handRankings together first by the same handValueWithoutKickers and then by actual handValue
             // The keys of each HandRank object will be the key of Player in $this->players
             // Note: The keys will be the cards converted to binary then to decimal.
             // Four players => [AAKK8, AA88K, AAKK7, AAKK8]
@@ -257,9 +257,9 @@ class NoLimitHoldem
             //      ]
             // ]
             // Set the handRanking to have the same index of the player in $this->players
-            $handTypeValue = $hand->getHandTypeValue();
+            $handValueWithoutKickers = $hand->getHandValueWithoutKickers();
             $handValue = $hand->getHandValue();
-            $hands[$handTypeValue][$handValue][$playerIndex] = $hand;
+            $hands[$handValueWithoutKickers][$handValue][$playerIndex] = $hand;
 
             // If current handRanking is the best hand, then set values to compare against future handRankings
             if ($handValue > $bestHandValue) {
@@ -272,7 +272,7 @@ class NoLimitHoldem
                 // Used when a kicker plays between the same type of hand (AAKK7 vs AAKK8)
                 // This is NOT used to determine the actual best hand, but to determine if we should include kickers
                 // in the hand description or not.
-                $bestHandTypeValue = $handTypeValue; // NOTE: May not need this now as handRankings are grouped by handTypes
+                $besthandValueWithoutKickers = $handValueWithoutKickers; // NOTE: May not need this now as handRankings are grouped by handTypes
             }
         }
         
@@ -291,9 +291,9 @@ class NoLimitHoldem
         }
 
         // Return the winners
-        // We know the bestHandTypeValue and bestHandValue so we can just return the Players than have been
+        // We know the besthandValueWithoutKickers and bestHandValue so we can just return the Players than have been
         // put in to the actual best hand bucket
         // Return the Player objects where the keys intersect with the keys of the winning bucket.
-        return array_intersect_key($this->players, $hands[$bestHandTypeValue][$bestHandValue]);
+        return array_intersect_key($this->players, $hands[$besthandValueWithoutKickers][$bestHandValue]);
     }
 }

@@ -48,6 +48,9 @@ class HighHandEvaluator extends Hand
     {
         parent::__construct($cards);
 
+        $this->valueHistogram = $this->generateValueHistogram();
+        $this->sortedValues = $this->sortValueHistogramAccordingToValue();
+
         $this->suitHistogram = $this->generateSuitHistogram();
 
         $this->generateHand();
@@ -279,7 +282,7 @@ class HighHandEvaluator extends Hand
         $numberOfSignificantCards = $this->numberOfSignificantCards() - 1;
 
         // Hand rank binary padded to four bits
-        $handValueBinary = $handTypeValueBinary = sprintf("%04d", decbin($this->handRank));
+        $handValueBinary = $handValueWithoutKickersBinary = sprintf("%04d", decbin($this->handRank));
 
         // Append card value binary padded to four bits, to binary string
         // The hand has already been normalised to left most significant cards
@@ -287,15 +290,12 @@ class HighHandEvaluator extends Hand
             // Add card binary to actual hand value
             $handValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
 
-            // Only add card binary if it's a significant card
-            if ($index <= $numberOfSignificantCards) {
-                $handTypeValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
-            }
+            $handValueWithoutKickersBinary .= ($index <= $numberOfSignificantCards) ? sprintf("%04d", decbin($card->getValueRank())) : '0000';
         }
 
         // Convert 24 bit binary to an integer
         $this->handValue = bindec($handValueBinary);
-        $this->handTypeValue = bindec($handTypeValueBinary);
+        $this->handValueWithoutKickers = bindec($handValueWithoutKickersBinary);
     }
 
     /**

@@ -46,7 +46,7 @@ class Hand
      * 
      * @var integer
      */
-    protected $handTypeValue = 0;
+    protected $handValueWithoutKickers = 0;
 
     /**
      * If the hand was determined by kickers, when comparing to another hand, then set to true
@@ -146,9 +146,6 @@ class Hand
         if (count($this->cards) < $this->minCards || count($this->cards) > $this->maxCards) {
             throw new InvalidHandRankingException('Need between ' . $this->minCards . ' and ' . $this->maxCards . ' cards to determine hand ranking');
         }
-
-        $this->valueHistogram = $this->generateValueHistogram();
-        $this->sortedValues = $this->sortValueHistogramAccordingToValue();
     }
 
     /**
@@ -207,9 +204,9 @@ class Hand
     *
     * @return integer
     */
-    public function getHandTypeValue(): Int
+    public function getHandValueWithoutKickers(): Int
     {
-        return $this->handTypeValue;
+        return $this->handValueWithoutKickers;
     }
 
     /**
@@ -217,7 +214,7 @@ class Hand
     * 
     * @return array
     */
-    private function generateValueHistogram(): Array
+    protected function generateValueHistogram(): Array
     {
         $values = [];
 
@@ -254,7 +251,7 @@ class Hand
     * 
     * @return array
     */
-    private function sortValueHistogramAccordingToValue(): Array
+    protected function sortValueHistogramAccordingToValue(): Array
     {
         $sortedHistogram = $this->valueHistogram;
 
