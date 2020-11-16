@@ -109,14 +109,14 @@ abstract class Hand
     protected $sortedValues = [];
 
     /**
-* Validate Cards
-* Used when instantiating different Hands
-* It accepts an array of at least five Cards
-* or a string of at least 5 cards in short values Cards
-* i.e. 'Ac2h3s4d5s'
-* 
-* @param array|string $cards
-*/
+    * Validate Cards
+    * Used when instantiating different Hands
+    * It accepts an array of at least five Cards
+    * or a string of at least 5 cards in short values Cards
+    * i.e. 'Ac2h3s4d5s'
+    * 
+    * @param array|string $cards
+    */
     protected function validateCards($cards)
     {
         if (is_array($cards)) {
@@ -150,71 +150,71 @@ abstract class Hand
     }
 
     /**
-* Returns the protected array of cards for this hand ranking 
-*
-* @return array
-*/
+    * Returns the protected array of cards for this hand ranking 
+    *
+    * @return array
+    */
     public function getCards(): Array
     {
         return $this->cards;
     }
 
     /**
-* Returns the protected array of best hand cards 
-*
-* @return array
-*/
+    * Returns the protected array of best hand cards 
+    *
+    * @return array
+    */
     public function getHand(): Array
     {
         return $this->hand;
     }
 
     /**
-* Returns short values description of the best hand found
-* e.g. Kh9c6h4s3d
-*
-* @return string
-*/
+    * Returns short values description of the best hand found
+    * e.g. Kh9c6h4s3d
+    *
+    * @return string
+    */
     public function getShortDescription(): String
     {
         return $this->shortDescription;
     }
 
     /**
-* Returns the hand ranking rank
-*
-* @return integer
-*/
+    * Returns the hand ranking rank
+    *
+    * @return integer
+    */
     public function getHandRank(): Int
     {
         return $this->handRank;
     }
 
     /**
-* Returns the hand's value
-*
-* @return integer
-*/
+    * Returns the hand's value
+    *
+    * @return integer
+    */
     public function getHandValue(): Int
     {
         return $this->handValue;
     }
 
     /**
-* Returns the hand type's value
-*
-* @return integer
-*/
+    * Returns the hand type's value
+    *
+    * @return integer
+    */
     public function getHandValueWithoutKickers(): Int
     {
         return $this->handValueWithoutKickers;
     }
 
     /**
-* Group and sort the cards according to the count of each value
-* 
-* @return array
-*/
+    * Group and sort the cards according to the count of each value
+    * 
+    * @return array
+    */
     protected function generateValueHistogram(): Array
     {
         $values = [];
@@ -247,11 +247,11 @@ abstract class Hand
     }
 
     /**
-* Sort the value histogram by value rank highest to lowest instead of count
-* This is needed for straights
-* 
-* @return array
-*/
+    * Sort the value histogram by value rank highest to lowest instead of count
+    * This is needed for straights
+    * 
+    * @return array
+    */
     protected function sortValueHistogramAccordingToValue(): Array
     {
         $sortedHistogram = $this->valueHistogram;
