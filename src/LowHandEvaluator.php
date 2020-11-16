@@ -19,7 +19,7 @@ class LowHandEvaluator extends Hand
         $this->sortedValues = $this->sortValueHistogramAccordingToValue();
 
         $this->generateHand();
-        // $this->computeHandValues();
+        $this->computeHandValues();
     }
 
     /**
