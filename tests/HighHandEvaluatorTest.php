@@ -305,4 +305,21 @@ class HighHandEvaluatorTest extends PHPokerTestCase
             ['3sQh4hTc8sKd6d5c', [new Card('Kd'), new Card('Qh'), new Card('Tc'), new Card('8s'), new Card('6d')], 'KdQhTc8s6d', 'High Card, King', HighHandEvaluator::HIGH_CARD_RANK],
         ];
     }
+
+    /** @test */
+    public function six_high_straight_value_is_greater_than_five_high_straight_value()
+    {
+        // Because we copy the Ace but set the straight index value to 1, when we compute
+        // the binary we use the Ace value of 14 instead
+        // Double checking 65432 is still greater than 54321
+
+        $sixStraight = new HighHandEvaluator('6h5d4c3s2s');
+        $fiveStraight = new HighHandEvaluator('5d4c3s2sAd');
+
+        // Assert both straight
+        $this->assertSame($sixStraight->getHandRank(), $fiveStraight->getHandRank());
+
+        // Assert six high straight is bigger than five high straight
+        $this->assertTrue($sixStraight->getHandValue() > $fiveStraight->getHandValue());
+    }
 }
