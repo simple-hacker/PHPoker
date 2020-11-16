@@ -3,28 +3,28 @@
 namespace simplehacker\PHPoker;
 
 use simplehacker\PHPoker\Hand;
-use simplehacker\PHPoker\Exceptions\InvalidHandRankingException;
+use simplehacker\PHPoker\Exceptions\InvalidHandException;
 
 class HighHandEvaluator extends Hand
 {
     /**
-     * The cards grouped and sorted by count of each suit
-     * 
-     * @var array
-     */
+    * The cards grouped and sorted by count of each suit
+    * 
+    * @var array
+    */
     protected $suitHistogram = [];
 
     /**
-     * If a straight is found then this will be the five key values of the straight in order
-     * e.g. [13, 12, 11, 10, 9]
-     * 
-     * @var array
-     */
+    * If a straight is found then this will be the five key values of the straight in order
+    * e.g. [13, 12, 11, 10, 9]
+    * 
+    * @var array
+    */
     protected $foundStraight = [];
 
     /**
-     * The hand type rank values
-     */
+    * The hand type rank values
+    */
     const ROYAL_FLUSH_RANK      = 10;
     const STRAIGHT_FLUSH_RANK   = 9;
     const FOUR_OF_A_KIND_RANK   = 8;
@@ -37,8 +37,7 @@ class HighHandEvaluator extends Hand
     const HIGH_CARD_RANK        = 1;
 
     /**
-    * Call the parent's construct which converts cards to an array of Cards
-    * and generates a histogram of card values
+    * Validate the Cards given and generates a histogram of card values and suits
     * This constructor then generates a suit histogram needed for high hands
     * and generates the best high hand
     * 
@@ -46,7 +45,7 @@ class HighHandEvaluator extends Hand
     */
     public function __construct($cards)
     {
-        parent::__construct($cards);
+        $this->validateCards($cards);
 
         $this->valueHistogram = $this->generateValueHistogram();
         $this->sortedValues = $this->sortValueHistogramAccordingToValue();
@@ -101,7 +100,7 @@ class HighHandEvaluator extends Hand
     * 
     * @return array
     */
-    private function generateSuitHistogram(): Array
+    protected function generateSuitHistogram(): Array
     {
         $suits = [];
 
@@ -133,93 +132,51 @@ class HighHandEvaluator extends Hand
     * 
     * @return void
     */
-    private function generateHand()
+    protected function generateHand()
     {
         if ($this->isRoyalFlush())
         {
-            $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->handRank = static::ROYAL_FLUSH_RANK;
-            $this->description = 'Royal Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
+            $this->royalFlush();
         }
         elseif ($this->isStraightFlush())
         {
-            $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->handRank = static::STRAIGHT_FLUSH_RANK;
-            $this->description = 'Straight Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
+            $this->straightFlush();
         }
         elseif ($this->isFourOfAKind())
         {
-            $fourOfAKind = array_slice(reset($this->valueHistogram), 0, 4);
-            // Get the best card after removing top 1 of histogram (four of a kind is the top of value histogram)
-            $withoutTopN = 1;
-            $highestCard = $this->getHighCard($withoutTopN);
-            $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
-            $this->hand = $fourOfAKind;
-            $this->handRank = static::FOUR_OF_A_KIND_RANK;
-            $this->description = 'Four of a Kind, ' . $this->hand[0]->getValue() . 's';
+            $this->fourOfAKind();
         }
         elseif ($this->isFullHouse())
         {
-            $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 2));
-            $this->handRank = static::FULL_HOUSE_RANK;
-            $this->description = 'Full House, ' . $this->hand[0]->getValue() . 's full of ' . $this->hand[3]->getValue() . 's';
+            $this->fullHouse();
         }
         elseif ($this->isFlush())
         {
-            $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
-            $this->handRank = static::FLUSH_RANK;
-            $this->description = 'Flush, ' . $this->hand[0]->getValue() . ' high of ' . $this->hand[0]->getSuit();
+            $this->flush();
         }
         elseif ($this->isStraight())
         {
-            // Loop through the foundStraight and return the first Card at valueIndex
-            $this->hand = array_map(fn($valueIndex) => $this->sortedValues[$valueIndex][0], $this->foundStraight);
-            $this->handRank = static::STRAIGHT_RANK;
-            $this->description = 'Straight, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue();
+            $this->straight();
         }
         elseif ($this->isThreeOfAKind())
         {
-            $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 1), array_slice(next($this->valueHistogram), 0, 1));
-            $this->handRank = static::THREE_OF_A_KIND_RANK;
-            $this->description = 'Three of a Kind, ' . $this->hand[0]->getValue() .'s';
+            $this->threeOfAKind();
         }
         elseif ($this->isTwoPair())
         {
-            $twoPair = array_merge(array_slice(reset($this->valueHistogram), 0, 2), array_slice(next($this->valueHistogram), 0, 2));
-            // Get the best card after removing top 2 of histogram (Two pair is the top two of value histogram)
-            $withoutTopN = 2;
-            $highestCard = $this->getHighCard($withoutTopN);
-            $twoPair[] = $highestCard; // Append highestCard to twoPair
-            $this->hand = $twoPair;
-            $this->handRank = static::TWO_PAIR_RANK;
-            $this->description = 'Two Pair, ' . $this->hand[0]->getValue() .'s and ' . $this->hand[2]->getValue() .'s';
+            $this->twoPair();
         }
         elseif ($this->isOnePair())
         {
-            $this->hand = array_merge(
-                                array_slice(reset($this->valueHistogram), 0, 2),
-                                array_slice(next($this->valueHistogram), 0, 1),
-                                array_slice(next($this->valueHistogram), 0, 1),
-                                array_slice(next($this->valueHistogram), 0, 1)
-                        );
-            $this->handRank = static::ONE_PAIR_RANK;
-            $this->description = 'One Pair, ' . $this->hand[0]->getValue() .'s';
+            $this->onePair();
         }
         elseif ($this->isHighCard())
         {
-            $this->hand = array_merge(
-                                array_slice(reset($this->valueHistogram), 0, 1),
-                                array_slice(next($this->valueHistogram), 0, 1),
-                                array_slice(next($this->valueHistogram), 0, 1),
-                                array_slice(next($this->valueHistogram), 0, 1),
-                                array_slice(next($this->valueHistogram), 0, 1)
-                        );
-            $this->handRank = static::HIGH_CARD_RANK;
-            $this->description = 'High Card, ' . $this->hand[0]->getValue();
+            $this->highCard();
         }
         
         if (count($this->hand) !== 5) {
-            throw new InvalidHandRankingException('Unable to determine best hand rank');
+            throw new InvalidHandException('Unable to determine best hand rank');
         }
 
         // Generate hand short description by combining the shortDescription of each card in the best hand
@@ -241,10 +198,10 @@ class HighHandEvaluator extends Hand
     * @param array $notIncluding
     * @return Card
     */
-    private function getHighCard(int $removeTopN = 0): Card
+    protected function getHighCard(int $removeTopN = 0): Card
     {
         if(! ($removeTopN == 1 || $removeTopN == 2)) {
-            throw new InvalidHandRankingException('Removing too many cards to determine best high card');
+            throw new InvalidHandException('Removing too many cards to determine best high card');
         }
 
         $valueHistogramKeys = array_keys($this->valueHistogram);
@@ -253,7 +210,7 @@ class HighHandEvaluator extends Hand
         $highestValue = max($otherKeys);
 
         if(! $highestValue) {
-            throw new InvalidHandRankingException('No high card');
+            throw new InvalidHandException('No high card');
         }
 
         // Return the first card of the maximum value rank.
@@ -261,12 +218,12 @@ class HighHandEvaluator extends Hand
     }
 
     /**
-    * generate a numerical value for hand ranking
+    * Generate a numerical value for hand ranking
     * Used for quicker comparing of hands
     * 
     * @return void
     */
-    public function computeHandValues(): void
+    protected function computeHandValues(): void
     {
         // The hand is sorted with the most significant cards to the front i.e. [14, 12, 10, 6, 5]
         // https://stackoverflow.com/a/42396124/7095440
@@ -289,7 +246,8 @@ class HighHandEvaluator extends Hand
         foreach($this->hand as $index => $card) {
             // Add card binary to actual hand value
             $handValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
-
+            // If Card is significant for Hand_TYPE then add Card value binary
+            // Else it's a kicker, append 0000 instead
             $handValueWithoutKickersBinary .= ($index <= $numberOfSignificantCards) ? sprintf("%04d", decbin($card->getValueRank())) : '0000';
         }
 
@@ -497,5 +455,147 @@ class HighHandEvaluator extends Hand
                 && count(next($this->valueHistogram)) === 1
                 && count(next($this->valueHistogram)) === 1
                 && count(next($this->valueHistogram)) === 1);
+    }
+
+    /**
+    * Set Hand properties to be the Royal Flush
+    * 
+    * @return void
+    */
+    protected function royalFlush(): void
+    {
+        $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
+        $this->handRank = static::ROYAL_FLUSH_RANK;
+        $this->description = 'Royal Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
+    }
+
+    /**
+    * Set Hand properties to be the Straight Flush
+    * 
+    * @return void
+    */
+    protected function straightFlush(): void
+    {
+        $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
+        $this->handRank = static::STRAIGHT_FLUSH_RANK;
+        $this->description = 'Straight Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
+    }
+
+    /**
+    * Set Hand properties to be the Four of a Kind
+    * 
+    * @return void
+    */
+    protected function fourOfAKind(): void
+    {
+        $fourOfAKind = array_slice(reset($this->valueHistogram), 0, 4);
+        // Get the best card after removing top 1 of histogram (four of a kind is the top of value histogram)
+        $withoutTopN = 1;
+        $highestCard = $this->getHighCard($withoutTopN);
+        $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
+        $this->hand = $fourOfAKind;
+        $this->handRank = static::FOUR_OF_A_KIND_RANK;
+        $this->description = 'Four of a Kind, ' . $this->hand[0]->getValue() . 's';
+    }
+
+    /**
+    * Set Hand properties to be the Full House
+    * 
+    * @return void
+    */
+    protected function fullHouse(): void
+    {
+        $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 2));
+        $this->handRank = static::FULL_HOUSE_RANK;
+        $this->description = 'Full House, ' . $this->hand[0]->getValue() . 's full of ' . $this->hand[3]->getValue() . 's';
+    }
+
+    /**
+    * Set Hand properties to be the Flush
+    * 
+    * @return void
+    */
+    protected function flush(): void
+    {
+        $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
+        $this->handRank = static::FLUSH_RANK;
+        $this->description = 'Flush, ' . $this->hand[0]->getValue() . ' high of ' . $this->hand[0]->getSuit();
+    }
+
+    /**
+    * Set Hand properties to be the Straight
+    * 
+    * @return void
+    */
+    protected function straight(): void
+    {
+        // Loop through the foundStraight and return the first Card at valueIndex
+        $this->hand = array_map(fn($valueIndex) => $this->sortedValues[$valueIndex][0], $this->foundStraight);
+        $this->handRank = static::STRAIGHT_RANK;
+        $this->description = 'Straight, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue();
+    }
+
+    /**
+    * Set Hand properties to be the Three of a Kind
+    * 
+    * @return void
+    */
+    protected function threeOfAKind(): void
+    {
+        $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 1), array_slice(next($this->valueHistogram), 0, 1));
+        $this->handRank = static::THREE_OF_A_KIND_RANK;
+        $this->description = 'Three of a Kind, ' . $this->hand[0]->getValue() .'s';
+    }
+
+    /**
+    * Set Hand properties to be the Two Pair
+    * 
+    * @return void
+    */
+    protected function twoPair(): void
+    {
+        $twoPair = array_merge(array_slice(reset($this->valueHistogram), 0, 2), array_slice(next($this->valueHistogram), 0, 2));
+        // Get the best card after removing top 2 of histogram (Two pair is the top two of value histogram)
+        $withoutTopN = 2;
+        $highestCard = $this->getHighCard($withoutTopN);
+        $twoPair[] = $highestCard; // Append highestCard to twoPair
+        $this->hand = $twoPair;
+        $this->handRank = static::TWO_PAIR_RANK;
+        $this->description = 'Two Pair, ' . $this->hand[0]->getValue() .'s and ' . $this->hand[2]->getValue() .'s';
+    }
+
+    /**
+    * Set Hand properties to be the One Pair
+    * 
+    * @return void
+    */
+    protected function onePair(): void
+    {
+        $this->hand = array_merge(
+            array_slice(reset($this->valueHistogram), 0, 2),
+            array_slice(next($this->valueHistogram), 0, 1),
+            array_slice(next($this->valueHistogram), 0, 1),
+            array_slice(next($this->valueHistogram), 0, 1)
+            );
+        $this->handRank = static::ONE_PAIR_RANK;
+        $this->description = 'One Pair, ' . $this->hand[0]->getValue() .'s';
+    }
+
+    /**
+    * Set Hand properties to be the High Card
+    * 
+    * @return void
+    */
+    protected function highCard(): void
+    {
+        $this->hand = array_merge(
+            array_slice(reset($this->valueHistogram), 0, 1),
+            array_slice(next($this->valueHistogram), 0, 1),
+            array_slice(next($this->valueHistogram), 0, 1),
+            array_slice(next($this->valueHistogram), 0, 1),
+            array_slice(next($this->valueHistogram), 0, 1)
+            );
+        $this->handRank = static::HIGH_CARD_RANK;
+        $this->description = 'High Card, ' . $this->hand[0]->getValue();
     }
 }

@@ -272,7 +272,7 @@ class NoLimitHoldem
                 // Used when a kicker plays between the same type of hand (AAKK7 vs AAKK8)
                 // This is NOT used to determine the actual best hand, but to determine if we should include kickers
                 // in the hand description or not.
-                $besthandValueWithoutKickers = $handValueWithoutKickers; // NOTE: May not need this now as handRankings are grouped by handTypes
+                $besthandValueWithoutKickers = $handValueWithoutKickers;
             }
         }
         
