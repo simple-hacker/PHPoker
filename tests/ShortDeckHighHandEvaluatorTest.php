@@ -4,7 +4,7 @@ namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Tests\PHPokerTestCase;
-use simplehacker\PHPoker\ShortDeckHighHandEvaluator;
+use simplehacker\PHPoker\Evaluators\ShortDeckHighHandEvaluator;
 use simplehacker\PHPoker\Exceptions\InvalidShortDeckHandException;
 
 class ShortDeckHighHandEvaluatorTest extends PHPokerTestCase

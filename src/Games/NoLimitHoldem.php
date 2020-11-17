@@ -7,7 +7,7 @@ use simplehacker\PHPoker\Hand;
 use simplehacker\PHPoker\Player;
 use simplehacker\PHPoker\Exceptions\HandException;
 use simplehacker\PHPoker\Exceptions\InvalidActionException;
-use simplehacker\PHPoker\HighHandEvaluator;
+use simplehacker\PHPoker\Evaluators\HighHandEvaluator;
 
 class NoLimitHoldem
 {

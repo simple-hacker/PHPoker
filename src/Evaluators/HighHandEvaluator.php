@@ -1,11 +1,11 @@
 <?php
 
-namespace simplehacker\PHPoker;
+namespace simplehacker\PHPoker\Evaluators;
 
-use simplehacker\PHPoker\Hand;
+use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Exceptions\InvalidHandException;
 
-class HighHandEvaluator extends Hand
+class HighHandEvaluator extends HandEvaluator
 {
     /**
     * The cards grouped and sorted by count of each suit

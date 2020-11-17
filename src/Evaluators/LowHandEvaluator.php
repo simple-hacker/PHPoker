@@ -1,8 +1,8 @@
 <?php
 
-namespace simplehacker\PHPoker;
+namespace simplehacker\PHPoker\Evaluators;
 
-class LowHandEvaluator extends Hand
+class LowHandEvaluator extends HandEvaluator
 {
     /**
     * Validate the Cards given and generates a histogram of card values and suits

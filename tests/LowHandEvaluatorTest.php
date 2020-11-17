@@ -3,7 +3,7 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
-use simplehacker\PHPoker\LowHandEvaluator;
+use simplehacker\PHPoker\Evaluators\LowHandEvaluator;
 use simplehacker\PHPoker\Exceptions\InvalidHandException;
 
 class LowHandEvaluatorTest extends PHPokerTestCase

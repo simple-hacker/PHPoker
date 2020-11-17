@@ -1,6 +1,6 @@
 <?php
 
-namespace simplehacker\PHPoker;
+namespace simplehacker\PHPoker\Evaluators;
 
 use simplehacker\PHPoker\Exceptions\InvalidHandException;
 use simplehacker\PHPoker\Exceptions\InvalidShortDeckHandException;

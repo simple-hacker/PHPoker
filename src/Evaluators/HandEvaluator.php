@@ -1,11 +1,11 @@
 <?php
 
-namespace simplehacker\PHPoker;
+namespace simplehacker\PHPoker\Evaluators;
 
 use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Exceptions\InvalidHandException;
 
-abstract class Hand
+abstract class HandEvaluator
 {     
     /**
     * The cards given for the hand ranking
