@@ -3,10 +3,10 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
-use simplehacker\PHPoker\Hands\NoLimitHoldemHand;
+use simplehacker\PHPoker\Hands\TexasHoldemHand;
 use simplehacker\PHPoker\Evaluators\HighHandEvaluator;
 
-class NoLimitHoldemTest extends PHPokerTestCase
+class TexasHoldemTest extends PHPokerTestCase
 {
     /** @test */
     public function a_nlh_hand_can_be_instantiated_with_a_string_of_cards()
@@ -14,7 +14,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
         $communityCards = '9h3s9cJsKs';
         $holeCards = 'KhJc';
 
-        $hand = new NoLimitHoldemHand($communityCards, $holeCards);
+        $hand = new TexasHoldemHand($communityCards, $holeCards);
 
         $this->assertEquals([new Card('Ks'), new Card('Kh'), new Card('Js'), new Card('Jc'), new Card('9h')], $hand->getHand());
         $this->assertEquals('KsKhJsJc9h', $hand->getShortDescription());
@@ -26,7 +26,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
         $communityCards = [new Card('9h'), '3s', new Card('9c'), new Card('Js'), new Card('Ks')];
         $holeCards = ['Kh', new Card('Jc')];
 
-        $hand = new NoLimitHoldemHand($communityCards, $holeCards);
+        $hand = new TexasHoldemHand($communityCards, $holeCards);
 
         $this->assertEquals([new Card('Ks'), new Card('Kh'), new Card('Js'), new Card('Jc'), new Card('9h')], $hand->getHand());
         $this->assertEquals('KsKhJsJc9h', $hand->getShortDescription());
@@ -38,7 +38,7 @@ class NoLimitHoldemTest extends PHPokerTestCase
     */
     public function hand_ranking_gives_best_five_cards($communityCards, $holeCards, $hand, $handShortDescription, $handDescription, $handRank)
     {
-        $noLimitHand = new NoLimitHoldemHand($communityCards, $holeCards);
+        $noLimitHand = new TexasHoldemHand($communityCards, $holeCards);
 
         $this->assertEquals($noLimitHand->getHand(), $hand);
         $this->assertEquals($noLimitHand->getHandRank(), $handRank);
