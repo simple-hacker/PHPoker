@@ -4,10 +4,10 @@ namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Deck;
-use simplehacker\PHPoker\Tests\PHPokerTestCase;
+use PHPUnit\Framework\TestCase;
 use simplehacker\PHPoker\Exceptions\InvalidDeckOperationException;
 
-class DeckTest extends PHPokerTestCase
+class DeckTest extends TestCase
 {
     /** @test */
     public function deck_holds_52_cards()

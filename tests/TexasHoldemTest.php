@@ -3,10 +3,11 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
+use PHPUnit\Framework\TestCase;
 use simplehacker\PHPoker\Hands\TexasHoldemHand;
 use simplehacker\PHPoker\Evaluators\HighHandEvaluator;
 
-class TexasHoldemTest extends PHPokerTestCase
+class TexasHoldemTest extends TestCase
 {
     /** @test */
     public function a_nlh_hand_can_be_instantiated_with_a_string_of_cards()

@@ -3,10 +3,10 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
-use simplehacker\PHPoker\Tests\PHPokerTestCase;
+use PHPUnit\Framework\TestCase;
 use simplehacker\PHPoker\Exceptions\InvalidCardException;
 
-class CardTest extends PHPokerTestCase
+class CardTest extends TestCase
 {
     /**
     * @test

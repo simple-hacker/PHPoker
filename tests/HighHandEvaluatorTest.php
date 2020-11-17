@@ -3,10 +3,10 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
+use PHPUnit\Framework\TestCase;
 use simplehacker\PHPoker\Evaluators\HighHandEvaluator;
-use simplehacker\PHPoker\Tests\PHPokerTestCase;
 
-class HighHandEvaluatorTest extends PHPokerTestCase
+class HighHandEvaluatorTest extends TestCase
 {
     /** @test */
     public function cards_are_grouped_and_sorted_by_value()

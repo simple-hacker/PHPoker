@@ -3,10 +3,11 @@
 namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
+use PHPUnit\Framework\TestCase;
 use simplehacker\PHPoker\Evaluators\LowHandEvaluator;
 use simplehacker\PHPoker\Exceptions\InvalidHandException;
 
-class LowHandEvaluatorTest extends PHPokerTestCase
+class LowHandEvaluatorTest extends TestCase
 {
     /** @test */
     public function an_array_of_cards_can_be_given_when_instantiating()
