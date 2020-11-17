@@ -4,9 +4,12 @@ namespace simplehacker\PHPoker\Evaluators;
 
 use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Exceptions\InvalidHandException;
+use simplehacker\PHPoker\Traits\Hand;
 
 abstract class HandEvaluator
-{     
+{   
+    use Hand;
+
     /**
     * The cards given for the hand ranking
     * 
@@ -14,48 +17,6 @@ abstract class HandEvaluator
     */
     protected $cards = [];
 
-    /**
-    * The best five cards given for the hand ranking
-    * 
-    * @var array
-    */
-    protected $hand = [];
-
-    /**
-    * The hand ranking rank
-    * e.g. Royal Flush = 10, Three of a Kind = 4
-    * Used when compairing two hands together to determine winner
-    * 
-    * @var integer
-    */
-    protected $handRank = 0;
-
-    /**
-    * The hand ranking value
-    * Used when comparing hands together
-    * See computeHandValues for how this is calculated
-    * 
-    * @var integer
-    */
-    protected $handValue = 0;
-
-    /**
-    * The hand ranking type value
-    * Used when working out if we need to include kickers in a description
-    * See computeHandValues for how this is calculated
-    * 
-    * @var integer
-    */
-    protected $handValueWithoutKickers = 0;
-
-    /**
-    * If the hand was determined by kickers, when comparing to another hand, then set to true
-    * Used when generating a description to include kicker information
-    * 
-    * @var bool
-    */
-    public $determinedByKickers = false;
-    
     /**
     * Minimum number of cards to make a hand
     * 
@@ -76,22 +37,6 @@ abstract class HandEvaluator
     * @var integer
     */
     protected $lowAceValue = 1;
-
-    /**
-    * The hand ranking short description
-    * e.g. Kh9c6h4s3d
-    * 
-    * @var string
-    */
-    protected $shortDescription = '';
-
-    /**
-    * The hand ranking description
-    * e.g. Four of a Kind, Jacks
-    * 
-    * @var string
-    */
-    protected $description = '';
 
     /**
     * The cards grouped and sorted by count of each value rank
@@ -119,19 +64,7 @@ abstract class HandEvaluator
     */
     protected function validateCards($cards)
     {
-        if (is_array($cards)) {
-            $this->cards = array_map(function($card) {
-                return ($card instanceof Card) ? $card : new Card($card);
-            }, $cards);
-        }
-
-        if (is_string($cards)) {
-            $shortCards = str_split($cards, 2);
-
-            $this->cards = array_map(function($shortCardValue) {
-                return new Card($shortCardValue);
-            }, $shortCards);
-        }
+        $this->cards = Card::convertToCards($cards);
 
         // Throw error if duplicate cards are given
         $uniqueCards = array_unique($this->cards);
@@ -157,57 +90,6 @@ abstract class HandEvaluator
     public function getCards(): Array
     {
         return $this->cards;
-    }
-
-    /**
-    * Returns the protected array of best hand cards 
-    *
-    * @return array
-    */
-    public function getHand(): Array
-    {
-        return $this->hand;
-    }
-
-    /**
-    * Returns short values description of the best hand found
-    * e.g. Kh9c6h4s3d
-    *
-    * @return string
-    */
-    public function getShortDescription(): String
-    {
-        return $this->shortDescription;
-    }
-
-    /**
-    * Returns the hand ranking rank
-    *
-    * @return integer
-    */
-    public function getHandRank(): Int
-    {
-        return $this->handRank;
-    }
-
-    /**
-    * Returns the hand's value
-    *
-    * @return integer
-    */
-    public function getHandValue(): Int
-    {
-        return $this->handValue;
-    }
-
-    /**
-    * Returns the hand type's value
-    *
-    * @return integer
-    */
-    public function getHandValueWithoutKickers(): Int
-    {
-        return $this->handValueWithoutKickers;
     }
 
     /**

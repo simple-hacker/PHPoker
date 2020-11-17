@@ -72,6 +72,37 @@ class Card
     }
 
     /**
+     * Return an array of Card instances given an array or a string
+     * Array can contain mixed instances of Card or a short Card description string
+     * e.g. [new Card('Ah'), '3s', '4c', new Card('9s')]
+     * or
+     * e.g. 'Ah3s4c'
+     *
+     * @param array|string $cards
+     */
+    public static function convertToCards($cards)
+    {
+        if (is_array($cards))
+        {
+            // Map over array.
+            // If it's already an instance of Card then return the Card instance
+            // Else try to instantiate a Card with the value
+            return array_map(fn($card) => ($card instanceof Card) ? $card : new Card($card), $cards);
+        }
+
+        if (is_string($cards))
+        {
+            // Split string in to every two characters
+            $shortCards = str_split($cards, 2);
+            // Try to instantiate a Card instance with every two characters
+            return array_map(fn($shortCardValue) => new Card($shortCardValue), $shortCards);
+        }
+
+        // If it's not an array or string throw exception
+        throw new InvalidCardException('Invalid argument type for Cards');
+    }
+
+    /**
     * When Card class is converted to string, return the shortValue string
     * This is used when compairing two Cards as a string when using array_unique
     * 

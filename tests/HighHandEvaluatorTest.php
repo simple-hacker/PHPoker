@@ -269,12 +269,10 @@ class HighHandEvaluatorTest extends PHPokerTestCase
     * @test
     * @dataProvider bestHands
     */
-    public function hand_ranking_gives_best_five_cards($cards, $hand, $handShortDescription, $handDescription, $handRank)
+    public function hand_ranking_gives_best_five_cards($cards, $hand, $handRank)
     {
         $handRanking = new HighHandEvaluator($cards);
         $this->assertEquals($handRanking->getHand(), $hand);
-        $this->assertEquals($handRanking->getShortDescription(), $handShortDescription);
-        $this->assertEquals($handRanking->getDescription(), $handDescription);
         $this->assertEquals($handRanking->getHandRank(), $handRank);
     }
 
@@ -292,17 +290,17 @@ class HighHandEvaluatorTest extends PHPokerTestCase
         // Royal Flush, Ace to Ten of Diamonds
 
         return [
-            ['3hJdQdAdKdTd6s', [new Card('Ad'), new Card('Kd'), new Card('Qd'), new Card('Jd'), new Card('Td')], 'AdKdQdJdTd', 'Royal Flush, Ace to Ten of Diamonds', HighHandEvaluator::ROYAL_FLUSH_RANK],
-            ['3hTd6d8d7d9d6s', [new Card('Td'), new Card('9d'), new Card('8d'), new Card('7d'), new Card('6d')], 'Td9d8d7d6d', 'Straight Flush, Ten to Six of Diamonds', HighHandEvaluator::STRAIGHT_FLUSH_RANK],
-            ['7sJs9dJc7hJhJdAh', [new Card('Js'), new Card('Jh'), new Card('Jd'), new Card('Jc'), new Card('Ah')], 'JsJhJdJcAh', 'Four of a Kind, Jacks', HighHandEvaluator::FOUR_OF_A_KIND_RANK],
-            ['6dTd5c6h6sTs5h', [new Card('6s'), new Card('6h'), new Card('6d'), new Card('Ts'), new Card('Td')], '6s6h6dTsTd', 'Full House, Sixs full of Tens', HighHandEvaluator::FULL_HOUSE_RANK], //666TT55 given
-            ['6dTd5c6h6sTsTh', [new Card('Ts'), new Card('Th'), new Card('Td'), new Card('6s'), new Card('6h')], 'TsThTd6s6h', 'Full House, Tens full of Sixs', HighHandEvaluator::FULL_HOUSE_RANK], //TTT6665 given
-            ['AcKd2d4s8d3d9dTd', [new Card('Kd'), new Card('Td'), new Card('9d'), new Card('8d'), new Card('3d')], 'KdTd9d8d3d', 'Flush, King high of Diamonds', HighHandEvaluator::FLUSH_RANK],
-            ['Qc9sJd4cTc4d8s', [new Card('Qc'), new Card('Jd'), new Card('Tc'), new Card('9s'), new Card('8s')], 'QcJdTc9s8s', 'Straight, Queen to Eight', HighHandEvaluator::STRAIGHT_RANK],
-            ['Qc8sKhJhAsJdJc', [new Card('Jh'), new Card('Jd'), new Card('Jc'), new Card('As'), new Card('Kh')], 'JhJdJcAsKh', 'Three of a Kind, Jacks', HighHandEvaluator::THREE_OF_A_KIND_RANK],
-            ['3s8dQs4dKc8c4h', [new Card('8d'), new Card('8c'), new Card('4h'), new Card('4d'), new Card('Kc')], '8d8c4h4dKc', 'Two Pair, Eights and Fours', HighHandEvaluator::TWO_PAIR_RANK],
-            ['Tc3sAdQh4d6h4c', [new Card('4d'), new Card('4c'), new Card('Ad'), new Card('Qh'), new Card('Tc')], '4d4cAdQhTc', 'One Pair, Fours', HighHandEvaluator::ONE_PAIR_RANK],
-            ['3sQh4hTc8sKd6d5c', [new Card('Kd'), new Card('Qh'), new Card('Tc'), new Card('8s'), new Card('6d')], 'KdQhTc8s6d', 'High Card, King', HighHandEvaluator::HIGH_CARD_RANK],
+            ['3hJdQdAdKdTd6s', [new Card('Ad'), new Card('Kd'), new Card('Qd'), new Card('Jd'), new Card('Td')], HighHandEvaluator::ROYAL_FLUSH_RANK],
+            ['3hTd6d8d7d9d6s', [new Card('Td'), new Card('9d'), new Card('8d'), new Card('7d'), new Card('6d')], HighHandEvaluator::STRAIGHT_FLUSH_RANK],
+            ['7sJs9dJc7hJhJdAh', [new Card('Js'), new Card('Jh'), new Card('Jd'), new Card('Jc'), new Card('Ah')], HighHandEvaluator::FOUR_OF_A_KIND_RANK],
+            ['6dTd5c6h6sTs5h', [new Card('6s'), new Card('6h'), new Card('6d'), new Card('Ts'), new Card('Td')], HighHandEvaluator::FULL_HOUSE_RANK],
+            ['6dTd5c6h6sTsTh', [new Card('Ts'), new Card('Th'), new Card('Td'), new Card('6s'), new Card('6h')], HighHandEvaluator::FULL_HOUSE_RANK],
+            ['AcKd2d4s8d3d9dTd', [new Card('Kd'), new Card('Td'), new Card('9d'), new Card('8d'), new Card('3d')], HighHandEvaluator::FLUSH_RANK],
+            ['Qc9sJd4cTc4d8s', [new Card('Qc'), new Card('Jd'), new Card('Tc'), new Card('9s'), new Card('8s')], HighHandEvaluator::STRAIGHT_RANK],
+            ['Qc8sKhJhAsJdJc', [new Card('Jh'), new Card('Jd'), new Card('Jc'), new Card('As'), new Card('Kh')], HighHandEvaluator::THREE_OF_A_KIND_RANK],
+            ['3s8dQs4dKc8c4h', [new Card('8d'), new Card('8c'), new Card('4h'), new Card('4d'), new Card('Kc')], HighHandEvaluator::TWO_PAIR_RANK],
+            ['Tc3sAdQh4d6h4c', [new Card('4d'), new Card('4c'), new Card('Ad'), new Card('Qh'), new Card('Tc')], HighHandEvaluator::ONE_PAIR_RANK],
+            ['3sQh4hTc8sKd6d5c', [new Card('Kd'), new Card('Qh'), new Card('Tc'), new Card('8s'), new Card('6d')], HighHandEvaluator::HIGH_CARD_RANK],
         ];
     }
 

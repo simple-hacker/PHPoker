@@ -57,37 +57,13 @@ class HighHandEvaluator extends HandEvaluator
     }
 
     /**
-    * Returns the description of the best hand found
-    * with kickerDescription if it exists
-    * e.g. Four of a Kind, Jacks
-    *
-    * @return string
+    * Return all values needed during a HandEvaluation
+    * 
+    * @return array
     */
-    public function getDescription(): string
+    public function evaluate(): Array
     {
-        return ($this->determinedByKickers) ? $this->description . $this->getKickerDescription() : $this->description;
-    }
-
-    /**
-    * If the hand was determined by kickers when comparing hands
-    * Generate the kickers description
-    *
-    * @return string
-    */
-    public function getKickerDescription(): string
-    {
-        $numberOfSignificantCards = $this->numberOfSignificantCards();
-
-        // Remove the most significant cards of the hand (by offsetting array_slice), leaving only the kickers
-        $kickers = array_slice($this->hand, $numberOfSignificantCards);
-        
-        // Map over and return the card value description from each card
-        $kickers = array_map(fn($kicker) => $kicker->getValue(), $kickers);
-        $kickerDescriptionEnd = (count($kickers) > 1) ? ' kickers' : ' kicker';
-        
-        // If we have kickers then glue kickers together and generate description
-        // Else return empty string        
-        return ($kickers) ? ", with " . implode("+", $kickers). $kickerDescriptionEnd : '';
+        return [$this->hand, $this->handRank, $this->handValue, $this->handValueWithoutKickers];
     }
 
     /**
@@ -178,11 +154,6 @@ class HighHandEvaluator extends HandEvaluator
         if (count($this->hand) !== 5) {
             throw new InvalidHandException('Unable to determine best hand rank');
         }
-
-        // Generate hand short description by combining the shortDescription of each card in the best hand
-        foreach($this->hand as $card) {
-            $this->shortDescription .= $card->getShortDescription();
-        }
     }
 
     /**
@@ -236,7 +207,7 @@ class HighHandEvaluator extends HandEvaluator
         // e.g. AAKK8 vs AAKK4
         // They both have the same significant card value (AAKK)
         // Take away one to match card indexes
-        $numberOfSignificantCards = $this->numberOfSignificantCards() - 1;
+        $numberOfSignificantCards = self::numberOfSignificantCards($this->handRank) - 1;
 
         // Hand rank binary padded to four bits
         $handValueBinary = $handValueWithoutKickersBinary = sprintf("%04d", decbin($this->handRank));
@@ -262,12 +233,13 @@ class HighHandEvaluator extends HandEvaluator
     * e.g. With two pair, the first four cards
     * e.g. With a straight, all cards
     * 
+    * @param integer $handRank
     * @return int
     */
-    private function numberOfSignificantCards(): Int
+    public static function numberOfSignificantCards(int $handRank): Int
     {
         // These are the types of hands that could have kickers
-        switch($this->handRank) {
+        switch($handRank) {
             case static::HIGH_CARD_RANK:
                 return 1;
             case static::ONE_PAIR_RANK:
@@ -466,7 +438,6 @@ class HighHandEvaluator extends HandEvaluator
     {
         $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
         $this->handRank = static::ROYAL_FLUSH_RANK;
-        $this->description = 'Royal Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
     }
 
     /**
@@ -478,7 +449,6 @@ class HighHandEvaluator extends HandEvaluator
     {
         $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
         $this->handRank = static::STRAIGHT_FLUSH_RANK;
-        $this->description = 'Straight Flush, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue() . ' of ' . $this->hand[0]->getSuit();
     }
 
     /**
@@ -495,7 +465,6 @@ class HighHandEvaluator extends HandEvaluator
         $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
         $this->hand = $fourOfAKind;
         $this->handRank = static::FOUR_OF_A_KIND_RANK;
-        $this->description = 'Four of a Kind, ' . $this->hand[0]->getValue() . 's';
     }
 
     /**
@@ -507,7 +476,6 @@ class HighHandEvaluator extends HandEvaluator
     {
         $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 2));
         $this->handRank = static::FULL_HOUSE_RANK;
-        $this->description = 'Full House, ' . $this->hand[0]->getValue() . 's full of ' . $this->hand[3]->getValue() . 's';
     }
 
     /**
@@ -519,7 +487,6 @@ class HighHandEvaluator extends HandEvaluator
     {
         $this->hand = array_slice(reset($this->suitHistogram), 0, 5);
         $this->handRank = static::FLUSH_RANK;
-        $this->description = 'Flush, ' . $this->hand[0]->getValue() . ' high of ' . $this->hand[0]->getSuit();
     }
 
     /**
@@ -532,7 +499,6 @@ class HighHandEvaluator extends HandEvaluator
         // Loop through the foundStraight and return the first Card at valueIndex
         $this->hand = array_map(fn($valueIndex) => $this->sortedValues[$valueIndex][0], $this->foundStraight);
         $this->handRank = static::STRAIGHT_RANK;
-        $this->description = 'Straight, ' . $this->hand[0]->getValue() . ' to ' . $this->hand[4]->getValue();
     }
 
     /**
@@ -544,7 +510,6 @@ class HighHandEvaluator extends HandEvaluator
     {
         $this->hand = array_merge(array_slice(reset($this->valueHistogram), 0, 3), array_slice(next($this->valueHistogram), 0, 1), array_slice(next($this->valueHistogram), 0, 1));
         $this->handRank = static::THREE_OF_A_KIND_RANK;
-        $this->description = 'Three of a Kind, ' . $this->hand[0]->getValue() .'s';
     }
 
     /**
@@ -561,7 +526,6 @@ class HighHandEvaluator extends HandEvaluator
         $twoPair[] = $highestCard; // Append highestCard to twoPair
         $this->hand = $twoPair;
         $this->handRank = static::TWO_PAIR_RANK;
-        $this->description = 'Two Pair, ' . $this->hand[0]->getValue() .'s and ' . $this->hand[2]->getValue() .'s';
     }
 
     /**
@@ -578,7 +542,6 @@ class HighHandEvaluator extends HandEvaluator
             array_slice(next($this->valueHistogram), 0, 1)
             );
         $this->handRank = static::ONE_PAIR_RANK;
-        $this->description = 'One Pair, ' . $this->hand[0]->getValue() .'s';
     }
 
     /**
@@ -596,6 +559,5 @@ class HighHandEvaluator extends HandEvaluator
             array_slice(next($this->valueHistogram), 0, 1)
             );
         $this->handRank = static::HIGH_CARD_RANK;
-        $this->description = 'High Card, ' . $this->hand[0]->getValue();
     }
 }

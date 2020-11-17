@@ -100,10 +100,5 @@ class ShortDeckHighHandEvaluator extends HighHandEvaluator
         if (count($this->hand) !== 5) {
             throw new InvalidHandException('Unable to determine best hand rank');
         }
-
-        // Generate hand short description by combining the shortDescription of each card in the best hand
-        foreach($this->hand as $card) {
-            $this->shortDescription .= $card->getShortDescription();
-        }
     }
 }
