@@ -82,7 +82,7 @@ class LowHandEvaluator extends HandEvaluator
         // The hand has already been normalised to left most significant cards
         foreach($this->hand as $index => $card) {
             // Add card binary to actual hand value
-            $handValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
+            $handValueBinary .= sprintf("%04d", decbin($card->getValueRank())) . sprintf("%04d", decbin($card->getSuitRank()));
         }
 
         // Convert 24 bit binary to an integer

@@ -2,7 +2,6 @@
 
 namespace simplehacker\PHPoker\Hands;
 
-use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Traits\Hand as HandTrait;
 use simplehacker\PHPoker\Evaluators\HighHandEvaluator;
 
@@ -33,47 +32,6 @@ abstract class Hand
     * @var string
     */
     protected $description = '';
-
-    /**
-    * Returns the five cards of the HandEvaluator
-    * 
-    * @param 
-    * @return array
-    */
-    public function getHand(): Array
-    {
-        return $this->hand;
-    }
-
-    /**
-    * Returns the hand rank of the HandEvaluator
-    *
-    * @return integer
-    */
-    public function getHandRank(): Int
-    {
-        return $this->handRank;
-    }
-
-    /**
-    * Returns the hand value of the HandEvaluator
-    *
-    * @return integer
-    */
-    public function getHandValue(): Int
-    {
-        return $this->handValue;
-    }
-
-    /**
-    * Returns the hand value without kickers of the HandEvaluator
-    *
-    * @return integer
-    */
-    public function getHandValueWithoutKickers(): Int
-    {
-        return $this->handValueWithoutKickers;
-    }
 
     /**
     * Returns short values description of the best hand found

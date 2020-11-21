@@ -278,17 +278,6 @@ class HighHandEvaluatorTest extends TestCase
 
     public function bestHands()
     {
-        // High Card King
-        // One Pair, Jacks
-        // Two Pair, Kings and Fours
-        // Three of a Kind, Jacks
-        // Straight, King to Nine
-        // Flush, King high Diamonds
-        // Full House, Eights full of Threes
-        // Four of a Kind, Jacks
-        // Straight Flush, King to Nine of Diamonds
-        // Royal Flush, Ace to Ten of Diamonds
-
         return [
             ['3hJdQdAdKdTd6s', [new Card('Ad'), new Card('Kd'), new Card('Qd'), new Card('Jd'), new Card('Td')], HighHandEvaluator::ROYAL_FLUSH_RANK],
             ['3hTd6d8d7d9d6s', [new Card('Td'), new Card('9d'), new Card('8d'), new Card('7d'), new Card('6d')], HighHandEvaluator::STRAIGHT_FLUSH_RANK],

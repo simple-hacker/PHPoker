@@ -4,6 +4,7 @@ namespace simplehacker\PHPoker\Hands;
 
 use simplehacker\PHPoker\Card;
 use simplehacker\PHPoker\Evaluators\HighHandEvaluator;
+use simplehacker\PHPoker\Exceptions\InvalidHandException;
 
 class TexasHoldemHand extends Hand
 {
@@ -15,6 +16,14 @@ class TexasHoldemHand extends Hand
     {
         $communityCards = Card::convertToCards($communityCards);
         $holeCards = Card::convertToCards($holeCards);
+
+        if (count($communityCards) !== 5) {
+            throw new InvalidHandException('Texas Holdem requires five community cards');
+        }
+
+        if (count($holeCards) !== 2) {
+            throw new InvalidHandException('Texas Holdem requires two hole cards cards');
+        }
 
         [$this->hand, $this->handRank, $this->handValue, $this->handValueWithoutKickers] = (new HighHandEvaluator([...$communityCards, ...$holeCards]))->evaluate();
     }

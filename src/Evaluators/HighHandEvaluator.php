@@ -198,9 +198,10 @@ class HighHandEvaluator extends HandEvaluator
     {
         // The hand is sorted with the most significant cards to the front i.e. [14, 12, 10, 6, 5]
         // https://stackoverflow.com/a/42396124/7095440
-        // Convert hand to a 24 bit binary
+        // Convert hand to a 44 bit binary
         // [HAND_RANK Binary] [Card 0 Binary] [Card 1 Binary] [Card 2 Binary] [Card 3 Binary] [Card 4 Binary]
-
+        // [4 bits] [8 bits] [8 bits] [8 bits] [8 bits] [8 bits]
+        // Card binary is 4 bit binary of Value and 4 bit value of suit
         // For certain hand types, only the first n cards are significant
         // Used when winning hands of the same type were eventually determined by their kicker
         // so that an appropriate description can be generated
@@ -216,10 +217,10 @@ class HighHandEvaluator extends HandEvaluator
         // The hand has already been normalised to left most significant cards
         foreach($this->hand as $index => $card) {
             // Add card binary to actual hand value
-            $handValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
+            $handValueBinary .= sprintf("%04d", decbin($card->getValueRank())) . sprintf("%04d", decbin($card->getSuitRank()));
             // If Card is significant for Hand_TYPE then add Card value binary
             // Else it's a kicker, append 0000 instead
-            $handValueWithoutKickersBinary .= ($index <= $numberOfSignificantCards) ? sprintf("%04d", decbin($card->getValueRank())) : '0000';
+            $handValueWithoutKickersBinary .= ($index <= $numberOfSignificantCards) ? sprintf("%04d", decbin($card->getValueRank())) . sprintf("%04d", decbin($card->getSuitRank())) : '00000000';
         }
 
         // Convert 24 bit binary to an integer
@@ -462,7 +463,7 @@ class HighHandEvaluator extends HandEvaluator
         // Get the best card after removing top 1 of histogram (four of a kind is the top of value histogram)
         $withoutTopN = 1;
         $highestCard = $this->getHighCard($withoutTopN);
-        $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind
+        $fourOfAKind[] = $highestCard; // Append highestCard to fourOfAKind5
         $this->hand = $fourOfAKind;
         $this->handRank = static::FOUR_OF_A_KIND_RANK;
     }
