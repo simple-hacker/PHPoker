@@ -2,7 +2,7 @@
 
 namespace simplehacker\PHPoker\Evaluators;
 
-class LowHandEvaluator extends HandEvaluator
+class EightLowHandEvaluator extends HandEvaluator
 {
     /**
     * Validate the Cards given and generates a histogram of card values and suits

@@ -4,16 +4,16 @@ namespace simplehacker\PHPoker\Tests;
 
 use simplehacker\PHPoker\Card;
 use PHPUnit\Framework\TestCase;
-use simplehacker\PHPoker\Evaluators\LowHandEvaluator;
 use simplehacker\PHPoker\Exceptions\InvalidHandException;
+use simplehacker\PHPoker\Evaluators\EightLowHandEvaluator;
 
-class LowHandEvaluatorTest extends TestCase
+class EightLowHandEvaluatorTest extends TestCase
 {
     /** @test */
     public function an_array_of_cards_can_be_given_when_instantiating()
     {
         $cards = [new Card('Ac'), '2d', new Card('3s'), new Card('4d'), new Card('5s')];
-        $hand = new LowHandEvaluator($cards);
+        $hand = new EightLowHandEvaluator($cards);
 
         $this->assertCount(5, $hand->getCards());
     }
@@ -25,7 +25,7 @@ class LowHandEvaluatorTest extends TestCase
 
         // Only four cards provided
         $cards = 'Ac2h3s4d';
-        $hand = new LowHandEvaluator($cards);
+        $hand = new EightLowHandEvaluator($cards);
     }
 
     /**
@@ -34,7 +34,7 @@ class LowHandEvaluatorTest extends TestCase
     */
     public function hands_have_a_low_hand($hand, $isLow)
     {
-        $hand = new LowHandEvaluator($hand);
+        $hand = new EightLowHandEvaluator($hand);
 
         $this->assertEquals($hand->hasLow(), $isLow);
     }
@@ -58,7 +58,7 @@ class LowHandEvaluatorTest extends TestCase
     */
     public function generates_best_low_hand($cards, $expectedHand, $description)
     {
-        $hand = new LowHandEvaluator($cards);
+        $hand = new EightLowHandEvaluator($cards);
 
         $this->assertEquals($expectedHand, $hand->getHand());
         $this->assertEquals($description, $hand->getDescription());
@@ -83,8 +83,8 @@ class LowHandEvaluatorTest extends TestCase
         // the binary we use the Ace value of 14 instead
         // Double checking 65432 is still greater than 54321
 
-        $sixLow = new LowHandEvaluator('6h5d4c3s2s');
-        $fiveLow = new LowHandEvaluator('5d4c3s2sAd');
+        $sixLow = new EightLowHandEvaluator('6h5d4c3s2s');
+        $fiveLow = new EightLowHandEvaluator('5d4c3s2sAd');
 
         // Assert both straight
         $this->assertSame($sixLow->getHandRank(), $fiveLow->getHandRank());

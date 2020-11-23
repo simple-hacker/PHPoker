@@ -201,7 +201,8 @@ class HighHandEvaluator extends HandEvaluator
         // Convert hand to a 44 bit binary
         // [HAND_RANK Binary] [Card 0 Binary] [Card 1 Binary] [Card 2 Binary] [Card 3 Binary] [Card 4 Binary]
         // [4 bits] [8 bits] [8 bits] [8 bits] [8 bits] [8 bits]
-        // Card binary is 4 bit binary of Value and 4 bit value of suit
+        // Card binary is 4 bit binary of Value and 4 bit value of suit.  This was needed for PLO hands where it would stop on the first best hand, but the suits were not in the right order.
+        // Now suits binaries play a factor in to the Cards that are returned for PLO
         // For certain hand types, only the first n cards are significant
         // Used when winning hands of the same type were eventually determined by their kicker
         // so that an appropriate description can be generated
