@@ -355,7 +355,8 @@ class HighHandEvaluator extends HandEvaluator
     */
     private function findStraight($values): Bool
     {
-        do {
+        while (count($values) > 4)
+        {
             // Take first five cards index values
             $fiveCards = array_slice($values, 0, 5);
             // Build a potential straight based off the first value of the first card
@@ -367,7 +368,7 @@ class HighHandEvaluator extends HandEvaluator
             }
             // If not sequential then remove first element and repeat while there are at least five cards
             array_splice($values, 0, 1);
-        } while(count($values) > 4);
+        }
 
         // Return false if no straight is found after looping and checking sequential of all given cards
         return false;
