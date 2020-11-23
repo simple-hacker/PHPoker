@@ -95,9 +95,9 @@ abstract class HandEvaluator
     /**
     * Group and sort the cards according to the count of each value
     * 
-    * @return array
+    * @return void
     */
-    protected function generateValueHistogram(): Array
+    protected function generateValueHistogram(): Void
     {
         $values = [];
 
@@ -125,16 +125,16 @@ abstract class HandEvaluator
             $values[$index] = $sortedValues;
         }
 
-        return $values;
+        $this->valueHistogram = $values;
     }
 
     /**
     * Sort the value histogram by value rank highest to lowest instead of count
     * This is needed for straights
     * 
-    * @return array
+    * @return void
     */
-    protected function sortValueHistogramAccordingToValue(): Array
+    protected function sortValueHistogramAccordingToValue(): Void
     {
         $sortedHistogram = $this->valueHistogram;
 
@@ -145,6 +145,6 @@ abstract class HandEvaluator
 
         krsort($sortedHistogram, SORT_NUMERIC);
 
-        return $sortedHistogram;
+        $this->sortedValues = $sortedHistogram;
     }
 }

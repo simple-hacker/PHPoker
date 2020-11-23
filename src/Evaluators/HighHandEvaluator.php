@@ -47,10 +47,10 @@ class HighHandEvaluator extends HandEvaluator
     {
         $this->validateCards($cards);
 
-        $this->valueHistogram = $this->generateValueHistogram();
-        $this->sortedValues = $this->sortValueHistogramAccordingToValue();
+        $this->generateValueHistogram();
+        $this->sortValueHistogramAccordingToValue();
 
-        $this->suitHistogram = $this->generateSuitHistogram();
+        $this->generateSuitHistogram();
 
         $this->generateHand();
         $this->computeHandValues();
@@ -74,9 +74,9 @@ class HighHandEvaluator extends HandEvaluator
     * This is so if there is a suit with 5 cards, then a flush exists
     * and we want the flush sorted according to their value so we know the highest flush value
     * 
-    * @return array
+    * @return void
     */
-    protected function generateSuitHistogram(): Array
+    protected function generateSuitHistogram(): Void
     {
         $suits = [];
 
@@ -98,7 +98,7 @@ class HighHandEvaluator extends HandEvaluator
             $suits[$index] = $sortedValues;
         }
 
-        return $suits;
+        $this->suitHistogram = $suits;
     }
 
     /**

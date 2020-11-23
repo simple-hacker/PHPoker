@@ -37,10 +37,10 @@ class ShortDeckHighHandEvaluator extends HighHandEvaluator
             }
         }
 
-        $this->valueHistogram = $this->generateValueHistogram();
-        $this->sortedValues = $this->sortValueHistogramAccordingToValue();
+        $this->generateValueHistogram();
+        $this->sortValueHistogramAccordingToValue();
 
-        $this->suitHistogram = $this->generateSuitHistogram();
+        $this->generateSuitHistogram();
 
         $this->generateHand();
         $this->computeHandValues();

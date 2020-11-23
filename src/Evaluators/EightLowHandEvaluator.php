@@ -15,8 +15,8 @@ class EightLowHandEvaluator extends HandEvaluator
     {
         $this->validateCards($cards);
 
-        $this->valueHistogram = $this->generateValueHistogram();
-        $this->sortedValues = $this->sortValueHistogramAccordingToValue();
+        $this->generateValueHistogram();
+        $this->sortValueHistogramAccordingToValue();
 
         $this->generateHand();
         $this->computeHandValues();
