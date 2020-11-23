@@ -198,7 +198,8 @@ class Card
     */
     public function getValue(): String
     {
-        return ucwords(self::$values[$this->value]['value']);
+        $value = ($this->value === 1) ? 14 : $this->value;
+        return ucwords(self::$values[$value]['value']);
     }
 
     /**
@@ -208,7 +209,8 @@ class Card
     */
     public function getShortValue(): String
     {
-        return ucwords(self::$values[$this->value]['short_value']);
+        $value = ($this->value === 1) ? 14 : $this->value;
+        return ucwords(self::$values[$value]['short_value']);
     }
 
     /**
@@ -271,5 +273,20 @@ class Card
     public function getShortDescription(): String
     {
         return $this->getShortValue() . $this->getShortSuit();
+    }
+
+    /**
+    * Flips the value of Ace to low value
+    * 
+    * @param 
+    * @return void
+    */
+    public function flipAce(): Void
+    {
+        if ($this->value !== 1 && $this->value !== 14) {
+            throw new InvalidCardException('Unable to flip a non ace Card');
+        }
+
+        $this->value = ($this->value === 14) ? 1 : 14;
     }
 }

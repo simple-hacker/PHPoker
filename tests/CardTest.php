@@ -212,4 +212,49 @@ class CardTest extends TestCase
             ['4S'],
         ];
     }
+
+    /** @test */
+    public function an_ace_can_be_flipped_to_low_value()
+    {
+        $ace = new Card('Ah');
+
+        $ace->flipAce();
+
+        $this->assertEquals(1, $ace->getValueRank());
+    }
+
+    /** @test */
+    public function non_ace_cannot_be_flipped()
+    {
+        $this->expectException(InvalidCardException::class);
+
+        $card = new Card('Kh');
+
+        $card->flipAce();
+    }
+
+    /** @test */
+    public function ace_can_be_flipped_back_and_forth()
+    {
+        $ace = new Card('Ah');
+        $this->assertEquals(14, $ace->getValueRank());
+
+        $ace->flipAce();
+        $this->assertEquals(1, $ace->getValueRank());
+
+        $ace->flipAce();
+        $this->assertEquals(14, $ace->getValueRank());
+    }
+
+    /** @test */
+    public function can_get_description_of_flipped_ace()
+    {
+        $ace = new Card('Ah');
+        $this->assertEquals(14, $ace->getValueRank());
+
+        $ace->flipAce();
+        $this->assertEquals('Ace', $ace->getValue());
+        $this->assertEquals('A', $ace->getShortValue());
+        $this->assertEquals(1, $ace->getValueRank());
+    }
 }
