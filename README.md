@@ -5,7 +5,7 @@ PHP library package for No Limit Texas Holdem poker.  This package allows you to
 Require the package using composer
 
 ```bash
-composer require simple-hacker/PHPoker
+composer require simple-hacker/phpoker
 ```
 
 
@@ -69,10 +69,11 @@ $hand->getHandValue();
 
 
 ## Cards
-Cards can be instantiated in numerous ways.  The follwing all result in the Ace of Spades:
+Cards can be instantiated in numerous ways.  The following all result in the Ace of Spades:
 
 ```php
-// As a short value where the first character is 23456789TJQKA and the suit as shcd
+// As a short value where the first character is card value 23456789TJQKA,
+// and the second character is card suit as shcd
 new Card('As');
 
 // Arguments for both value and suit
