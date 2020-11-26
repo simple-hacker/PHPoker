@@ -218,10 +218,10 @@ class HighHandEvaluator extends HandEvaluator
         // The hand has already been normalised to left most significant cards
         foreach($this->hand as $index => $card) {
             // Add card binary to actual hand value
-            $handValueBinary .= sprintf("%04d", decbin($card->getValueRank())) . sprintf("%04d", decbin($card->getSuitRank()));
+            $handValueBinary .= sprintf("%04d", decbin($card->getValueRank()));
             // If Card is significant for Hand_TYPE then add Card value binary
             // Else it's a kicker, append 0000 instead
-            $handValueWithoutKickersBinary .= ($index <= $numberOfSignificantCards) ? sprintf("%04d", decbin($card->getValueRank())) . sprintf("%04d", decbin($card->getSuitRank())) : '00000000';
+            $handValueWithoutKickersBinary .= ($index <= $numberOfSignificantCards) ? sprintf("%04d", decbin($card->getValueRank())) : '00000000';
         }
 
         // Convert 24 bit binary to an integer
